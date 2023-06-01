@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "prettier-format": "prettier --config .prettierrc src/**/*.ts --write",
+    "dev": "cross-env NODE_ENV=local ts-node-dev src/app.ts"
   },
   "repository": {
     "type": "git",
@@ -15,5 +18,21 @@
   "bugs": {
     "url": "https://github.com/eopalomi/ms-financial-operations/issues"
   },
-  "homepage": "https://github.com/eopalomi/ms-financial-operations#readme"
+  "homepage": "https://github.com/eopalomi/ms-financial-operations#readme",
+  "dependencies": {
+    "@typescript-eslint/parser": "^5.59.8",
+    "dotenv": "^16.1.3",
+    "eslint": "^8.41.0",
+    "express": "^4.18.2",
+    "pg": "^8.11.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.2.5",
+    "@types/pg": "^8.10.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "cross-env": "^7.0.3",
+    "prettier": "^2.8.8",
+    "ts-node-dev": "^2.0.0"
+  }
 }
