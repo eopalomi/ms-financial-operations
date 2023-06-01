@@ -1,8 +1,8 @@
-import { DebtWaiver } from "../model/debt-waiver.model";
+import { DebtWaiver } from '../model/debt-waiver.model';
 
 export type DebtWaiverRepository = {
-    save(): Promise<void>;
-    cancel(): Promise<void>;
-    find(): Promise<DebtWaiver>;
-    findAll(): Promise<DebtWaiver[]>;
-}
+  save(DebtWaiver: DebtWaiver): Promise<void>;
+  cancel(): Promise<void>;
+  find(): Promise<DebtWaiver>;
+  findAll(): Promise<DebtWaiver[]>;
+};
