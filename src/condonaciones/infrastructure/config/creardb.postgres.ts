@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 
-export class CreardbPostgres {
+export class crearDbPostgresDatabase {
   private static connection: Pool;
 
   static getConnection() {
