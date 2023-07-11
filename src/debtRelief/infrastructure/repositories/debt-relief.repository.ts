@@ -41,8 +41,8 @@ export class DebtReliefRepository implements DebtWaiverRepository {
          cod_cre: debtWaiver.creditCode!,
          num_cuo: debtWaiver.numberPayment!,
          lug_rec: debtWaiver.collectionLocationCode!,
-         num_ric: "99993",
-         cod_int: "BG3213",
+         num_ric: "91991",
+         cod_int: "BG3211",
          fec_pag: String(debtWaiver.paymentDate),
          hor_pag: String(debtWaiver.paymentHour),
          fec_doc: String(debtWaiver.paymentValueDate),
@@ -122,11 +122,10 @@ export class DebtReliefRepository implements DebtWaiverRepository {
 
       try {
 
-         const paymentScheduleRepositoryHTTP = new PaymentScheduleRepositoryHTTP();
-         const paymentScheduleService = new PaymentScheduleService(paymentScheduleRepositoryHTTP);
-         const schedule = paymentScheduleService.findPaymentSchedule(debtWaiver.creditCode);
-         console.log("schedule", schedule)
 
+
+         const response = await axios.post('http://localhost:3000/own-credit-payments', creditPayment);
+         //console.log("response", response)
 
       } catch (error: any) {
          console.log("Error details : ", error.response.data.error.details)

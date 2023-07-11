@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { routes } from './condonaciones/infrastructure/routes/debt-relief.routes';
+import { routes } from './debtRelief/infrastructure/routes/debt-relief.routes';
 
 const app = express();
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });

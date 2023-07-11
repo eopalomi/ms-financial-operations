@@ -1,22 +1,16 @@
+import { PaymentInstallment } from "./payment-installment.model";
+
 export class PaymentShedule {
     public readonly creditCode: string;
-    public readonly numberPayment: number;
-    public readonly principal: number;
-    public readonly interest: number;
-    public readonly vehicleInsurance: number;
-    public readonly lifeInsurance: number;
-    public readonly igvInsurance: number;
-    public readonly preventionInsurance: number;
-    public readonly principalBalance: number;
-    public readonly interestBalance: number;
-    public readonly feesbalance: number;
-    public readonly vehicleInsuranceBalance: number;
-    public readonly lifeInsuranceBalance: number;
-    public readonly igvInsuranceBalance: number;
-    public readonly preventionInsuranceBalance: number;
+    public readonly paymentInstallment: PaymentInstallment[] = [];
 
     constructor(constructor: {
         creditCode: string
+    }) {
+        this.creditCode = constructor.creditCode;
+    }
+
+    addInstallmentNumber(data: {
         numberPayment: number
         principal: number
         interest: number
@@ -32,20 +26,24 @@ export class PaymentShedule {
         igvInsuranceBalance: number
         preventionInsuranceBalance: number
     }) {
-        this.creditCode = constructor.creditCode;
-        this.numberPayment = constructor.numberPayment;
-        this.principal = constructor.principal;
-        this.interest = constructor.interest;
-        this.vehicleInsurance = constructor.vehicleInsurance;
-        this.lifeInsurance = constructor.lifeInsurance;
-        this.igvInsurance = constructor.igvInsurance;
-        this.preventionInsurance = constructor.preventionInsurance;
-        this.principalBalance = constructor.principalBalance;
-        this.interestBalance = constructor.interestBalance;
-        this.feesbalance = constructor.feesbalance;
-        this.vehicleInsuranceBalance = constructor.vehicleInsuranceBalance;
-        this.lifeInsuranceBalance = constructor.lifeInsuranceBalance;
-        this.igvInsuranceBalance = constructor.igvInsuranceBalance;
-        this.preventionInsuranceBalance = constructor.preventionInsuranceBalance;
+        const installmentNumber = new PaymentInstallment({
+            numberPayment: data.numberPayment,
+            principal: data.principal,
+            interest: data.interest,
+            vehicleInsurance: data.vehicleInsurance,
+            lifeInsurance: data.lifeInsurance,
+            igvInsurance: data.igvInsurance,
+            preventionInsurance: data.preventionInsurance,
+            principalBalance: data.principalBalance,
+            interestBalance: data.interestBalance,
+            feesbalance: data.feesbalance,
+            vehicleInsuranceBalance: data.vehicleInsuranceBalance,
+            lifeInsuranceBalance: data.lifeInsuranceBalance,
+            igvInsuranceBalance: data.igvInsuranceBalance,
+            preventionInsuranceBalance: data.preventionInsuranceBalance
+        });
+
+        this.paymentInstallment.push(installmentNumber)
     }
+
 }
