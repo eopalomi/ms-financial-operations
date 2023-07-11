@@ -115,14 +115,7 @@ export class DebtReliefRepository implements DebtWaiverRepository {
       };
 
       try {
-         const { data, status } = await axios.post<void>(
-            'http://localhost:3000/own-credit-payments',
-            creditPayment, {
-            headers: {
-               'Content-Type': 'application/json',
-               Accept: 'application/json',
-            }
-         });
+
       } catch (error: any) {
          console.log("Error: ", error.response)
          console.log("Error details : ", error.response.data.error.details)
@@ -135,9 +128,7 @@ export class DebtReliefRepository implements DebtWaiverRepository {
    }
 
    async find(): Promise<DebtRelief> {
-      const response = await axios.get<any>('http://[::1]:3000/own-payment-schedules?filter=%7B%0A%20%20%22offset%22%3A%200%2C%0A%20%20%22limit%22%3A%20100%2C%0A%20%20%22skip%22%3A%200%2C%0A%20%20%22order%22%3A%20%22num_cuo%22%2C%0A%20%20%22where%22%3A%20%7B%0A%20%20%20%20%22cod_cre%22%3A%20%22E1671001%22%0A%20%20%7D%2C%0A%20%20%22fields%22%3A%20%7B%0A%20%20%20%20%22cod_cre%22%3A%20true%2C%0A%20%20%20%20%22num_cuo%22%3A%20true%2C%0A%20%20%20%20%22capital%22%3A%20true%2C%0A%20%20%20%20%22interes%22%3A%20true%2C%0A%20%20%20%20%22cta_seg%22%3A%20true%2C%0A%20%20%20%20%22cta_seg_desgra%22%3A%20true%2C%0A%20%20%20%20%22cta_igv%22%3A%20true%2C%0A%20%20%20%20%22cta_seg_prev%22%3A%20true%2C%0A%20%20%20%20%22sal_cap%22%3A%20true%2C%0A%20%20%20%20%22sal_int%22%3A%20true%2C%0A%20%20%20%20%22sal_mor%22%3A%20true%2C%0A%20%20%20%20%22sal_seg%22%3A%20true%2C%0A%20%20%20%20%22sal_seg_desgra%22%3A%20true%2C%0A%20%20%20%20%22sal_seg_prev%22%3A%20true%2C%0A%20%20%20%20%22sal_igv%22%3A%20true%0A%20%20%7D%0A%7D')
-
-      return response.data;
+      throw new Error("Method not implemented.");
    }
 
    findAll(): Promise<DebtRelief[]> {
