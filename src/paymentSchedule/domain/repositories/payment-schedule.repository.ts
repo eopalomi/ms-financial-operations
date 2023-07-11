@@ -1,4 +1,4 @@
-import { PaymentShedule } from '../model/payment-schedule.model';
+import { PaymentShedule } from '../models/payment-schedule.model';
 
 export interface PaymentScheduleRepository {
     save(DebtWaiver: PaymentShedule): Promise<void>;

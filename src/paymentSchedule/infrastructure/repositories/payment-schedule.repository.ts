@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import * as qs from 'qs';
-import { PaymentShedule } from "../../domain/model/payment-schedule.model";
+import { PaymentShedule } from "../../domain/models/payment-schedule.model";
 import { PaymentScheduleRepository } from '../../domain/repositories/payment-schedule.repository';
 
 export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository {
