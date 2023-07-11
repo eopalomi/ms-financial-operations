@@ -1,4 +1,3 @@
-import { PaymentShedule } from '../domain/models/payment-schedule.model';
 import { PaymentScheduleRepository } from '../domain/repositories/payment-schedule.repository';
 
 export class FindPaymentScheduleUsecase {

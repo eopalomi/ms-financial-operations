@@ -5,6 +5,8 @@ import axios, { AxiosResponse } from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 import { crearDbPostgresDatabase } from "../config/creardb.postgres";
 import { creditPaymentInterfaceDTO } from "../DTO/pag_cuo.dto";
+import { PaymentScheduleService } from "../../../paymentSchedule/application/service/payment-schedule.service";
+import { PaymentScheduleRepositoryHTTP } from "../../../paymentSchedule/infrastructure/repositories/payment-schedule.repository";
 
 
 export class DebtReliefRepository implements DebtWaiverRepository {
@@ -30,6 +32,10 @@ export class DebtReliefRepository implements DebtWaiverRepository {
          authorizationPersonCode: debtWaiver.authorizationPersonCode,
          authorizationPersondocumentCode: debtWaiver.authorizationPersondocumentCode
       };
+
+      if (!debtWaiver.creditCode) {
+         return;
+      }
 
       const creditPayment: creditPaymentInterfaceDTO = {
          cod_cre: debtWaiver.creditCode!,
@@ -116,8 +122,13 @@ export class DebtReliefRepository implements DebtWaiverRepository {
 
       try {
 
+         const paymentScheduleRepositoryHTTP = new PaymentScheduleRepositoryHTTP();
+         const paymentScheduleService = new PaymentScheduleService(paymentScheduleRepositoryHTTP);
+         const schedule = paymentScheduleService.findPaymentSchedule(debtWaiver.creditCode);
+         console.log("schedule", schedule)
+
+
       } catch (error: any) {
-         console.log("Error: ", error.response)
          console.log("Error details : ", error.response.data.error.details)
          throw new Error(error)
       }
