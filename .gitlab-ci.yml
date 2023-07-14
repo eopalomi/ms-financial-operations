@@ -8,8 +8,8 @@ variables:
     PORTDOCKER: 3000
     # PORTSALIDA: 3325
     PORTSALIDA: 3185
-    IMAGENAME: lb-financial-operations
-    DOCKER_STACK: lb-financial-operations
+    IMAGENAME: ms-financial-operations
+    DOCKER_STACK: ms-financial-operations
 stages:
   - build
   - deploy-to-dev

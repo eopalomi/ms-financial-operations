@@ -14,7 +14,7 @@ services:
       #command: pm2-runtime server.config.js --env ${ENVDEPLOY}
       #command: npm run start:${ENVDEPLOY}
       # command: pm2 start ecosystem.config.js
-    command: bash -c "npm run start:${ENVDEPLOY}"
+    command: bash -c "npm run start:${ENVDEPLOY}; tail -f /dev/null"
     #command: bash -c "/usr/local/tomcat8_produccion/bin/startup.sh && tail -f /usr/local/tomcat8_produccion/logs/catalina.out"
     logging:
       driver: "gelf"
