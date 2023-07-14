@@ -17,7 +17,6 @@ export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository 
     }
 
     async find(creditCode: string): Promise<any> {
-
         const objFilter =
         {
             offset: 0,
@@ -46,10 +45,10 @@ export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository 
                 sal_igv: true
             }
         };
-
+        
         const {data: creditInfoResponse } = await axios.get(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/credit-information/${creditCode}`);
         const getHttpPath = creditInfoResponse.il_admacc === true ? 'own-payment-schedules' : 'transferred-payment-schedules';
-
+        
         const encodedPayload = encodeURIComponent(JSON.stringify(objFilter));
 
         const url = `${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/${getHttpPath}?filter=${encodedPayload}`;        
