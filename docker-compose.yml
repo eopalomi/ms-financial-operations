@@ -10,7 +10,6 @@ services:
     restart: always
     ports:
       - "${PORTSALIDA}:${PORTDOCKER}"
-      # - "3105:3105"
       #command: pm2-runtime server.config.js --env ${ENVDEPLOY}
       #command: npm run start:${ENVDEPLOY}
       # command: pm2 start ecosystem.config.js
