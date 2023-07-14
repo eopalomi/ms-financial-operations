@@ -12,6 +12,7 @@ export class PaymentShedule {
 
     addInstallmentNumber(data: {
         numberPayment: number
+        paymentDate: string
         principal: number
         interest: number
         vehicleInsurance: number
@@ -28,6 +29,7 @@ export class PaymentShedule {
     }) {
         const installmentNumber = new PaymentInstallment({
             numberPayment: data.numberPayment,
+            paymentDate: data.paymentDate,
             principal: data.principal,
             interest: data.interest,
             vehicleInsurance: data.vehicleInsurance,

@@ -9,6 +9,6 @@ const paymentScheduleRepository = new PaymentScheduleRepositoryHTTP();
 const paymentScheduleUsecase = new FindPaymentScheduleUsecase(paymentScheduleRepository);
 const paymentController = new PaymentScheduleController(paymentScheduleUsecase);
 
-routes.get('/payment-schedule', paymentController.findPaymentSchedule);
+routes.get('/payment-schedule/:id', paymentController.findPaymentSchedule);
 
-export { routes };
+export default routes;

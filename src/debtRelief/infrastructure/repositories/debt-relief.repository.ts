@@ -1,132 +1,84 @@
 import { Pool } from "pg";
-import { DebtWaiverRepository } from "../../domain/repositories/debt-waiver.repository";
+import { DebtReliefRepository } from "../../domain/repositories/debt-relief.repository";
 import { DebtRelief } from "../../domain/model/debt-relief.model";
-import axios, { AxiosResponse } from 'axios';
-import cloneDeep from 'lodash/cloneDeep';
-import { crearDbPostgresDatabase } from "../config/creardb.postgres";
+import axios from 'axios';
 import { creditPaymentInterfaceDTO } from "../DTO/pag_cuo.dto";
-import { PaymentScheduleService } from "../../../paymentSchedule/application/service/payment-schedule.service";
-import { PaymentScheduleRepositoryHTTP } from "../../../paymentSchedule/infrastructure/repositories/payment-schedule.repository";
+import { DebtReliefService } from "../../application/services/debt-relief.service";
+import { formatedDate } from "../../../commons/services/date-utils.services";
+import { toPayment } from "../services/payment.service";
 
+export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
+   constructor(private debtReliefService: DebtReliefService) {}
 
-export class DebtReliefRepository implements DebtWaiverRepository {
-   private readonly pool: Pool;
+   async save(debtRelief: Partial<DebtRelief>): Promise<void> {
+      const {data: dataResponse } = await axios.get(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/receipt-number/C5/1`);
+      const {data: creditInfoResponse } = await axios.get(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/credit-information/${debtRelief.creditCode}`);
+      const {data: dataProces } = await axios.get(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/payment-process`);
+      
+      const dataPaymentNumber = await this.debtReliefService.installmentAmounts(debtRelief.creditCode!, debtRelief.numberPayment!);
 
-   constructor() {
-      this.pool = crearDbPostgresDatabase.getConnection();
-   }
-
-   async save(debtWaiver: Partial<DebtRelief>): Promise<void> {
-      const debtReliefProps = {
-         creditCode: debtWaiver.creditCode,
-         ammount: debtWaiver.ammount,
-         numberPayment: debtWaiver.numberPayment,
-         principalAmount: debtWaiver.principalAmount,
-         interestAmount: debtWaiver.interestAmount,
-         lateFeeAmount: debtWaiver.lateFeeAmount,
-         collectionLocationCode: debtWaiver.collectionLocationCode,
-         banckAccountCode: debtWaiver.banckAccountCode,
-         paymentDate: debtWaiver.paymentDate,
-         paymentHour: debtWaiver.paymentHour,
-         paymentValueDate: debtWaiver.paymentValueDate,
-         authorizationPersonCode: debtWaiver.authorizationPersonCode,
-         authorizationPersondocumentCode: debtWaiver.authorizationPersondocumentCode
-      };
-
-      if (!debtWaiver.creditCode) {
+      if (!dataPaymentNumber){
          return;
       }
 
-      const creditPayment: creditPaymentInterfaceDTO = {
-         cod_cre: debtWaiver.creditCode!,
-         num_cuo: debtWaiver.numberPayment!,
-         lug_rec: debtWaiver.collectionLocationCode!,
-         num_ric: "91991",
-         cod_int: "BG3211",
-         fec_pag: String(debtWaiver.paymentDate),
-         hor_pag: String(debtWaiver.paymentHour),
-         fec_doc: String(debtWaiver.paymentValueDate),
-         pago: debtWaiver.ammount!,
-         pag_cap: debtWaiver.principalAmount!,
-         pag_int: debtWaiver.interestAmount!,
-         pag_seg: 0,
-         pag_seg_desgra: 0,
-         pag_mor: debtWaiver.lateFeeAmount!,
-         pag_mor_mor: 0,
-         pag_mor_com: 0,
+      const currentDate: string = formatedDate(new Date(),'yyyy-mm-dd');
+      const now: string = formatedDate(new Date(),'YYYY-MM-DD_hhmmss');
+      const currentHour: string = formatedDate(new Date(),'hh:mm');
+
+      const creditPayment: creditPaymentInterfaceDTO = toPayment({
+         cod_cre: debtRelief.creditCode!,
+         num_cuo: debtRelief.numberPayment!,
+         lug_rec: debtRelief.collectionLocationCode!,
+         num_ric: String(dataResponse.idReceipt),
+         cod_int: String(creditInfoResponse.cod_int),
+         fec_pag: String(debtRelief.paymentDate),
+         hor_pag: String(debtRelief.paymentHour),
+         fec_doc: String(debtRelief.paymentValueDate),
+         pago: debtRelief.ammount!,
+         pag_cap: debtRelief.principalAmount!,
+         pag_int: debtRelief.interestAmount!,
+         pag_seg: debtRelief.vehicleInsurance!,
+         pag_seg_desgra: debtRelief.lifeInsurance!,
+         pag_mor: debtRelief.lateFeeAmount!,
          pag_itf: 0,
-         pag_igv: 0,
-         dia_int: 0,
+         pag_igv: debtRelief.igvInsurance!,
          dia_mor: 0,
-         cod_ubi: "109",
-         tip_ope: "C",
-         ult_pag: String(debtWaiver.paymentDate),
-         cod_oei: "001",
-         enc_cap: 0,
-         enc_int: 0,
-         enc_mor: 0,
+         ult_pag: debtRelief.paymentDate ? String(debtRelief.paymentDate) : null,
+         enc_cap: dataPaymentNumber.principalBalance,
+         enc_int: dataPaymentNumber.interestBalance,
+         enc_mor: dataPaymentNumber.feesbalance,
          enc_mor_mor: 0,
          enc_mor_com: 0,
-         enc_seg: 0,
-         enc_seg_desgra: 0,
-         cal_cap: 0,
-         cal_int: 0,
-         cal_rea: 0,
-         cal_mor: 0,
-         cal_imo: 0,
-         cal_gas: 0,
-         cap_por: 0,
-         int_por: 0,
-         cap_ven: 0,
-         int_ven: 0,
-         hor_rec: 0,
-         vou_eess: 0,
-         bru_eess: 0,
-         itf_ent: 0,
-         itf_sal: 0,
-         rec_net: 0,
-         com_cof: 0,
-         net_tot: 0,
-         cod_eess: 0,
-         nom_eess: 0,
-         swt_tip_pag: "0",
-         fec_reg: "2023-07-06T19:37:52.088Z",
-         hor_reg: "00:01",
-         usu_reg: "PH008",
-         fec_reg_pag: "2023-11-17",
-         fec_pag_rea: "2023-11-17",
-         tip_pagcuo: 0,
-         swt_ser: 0,
-         can_ant: 0,
-         swt_can: "S",
-         emp_tra: "",
-         emp_ven: "",
-         fue_fin_pag: "PR",
-         mod_rea_pag: "CC",
-         tip_amo_rop: "CN",
-         fec_ven_pag: "2023-07-06",
-         swt_mig_pag_ven: "I",
+         enc_seg: dataPaymentNumber.vehicleInsuranceBalance,
+         enc_seg_desgra: dataPaymentNumber.lifeInsuranceBalance,
+         cal_cap: dataPaymentNumber.principalBalance,
+         cal_int: dataPaymentNumber.interestBalance,
+         cap_por: (dataPaymentNumber.principal - dataPaymentNumber.principalBalance),
+         int_por: (dataPaymentNumber.interest - dataPaymentNumber.interestBalance),
+         cap_ven: dataPaymentNumber.principalBalance,
+         int_ven: dataPaymentNumber.interestBalance,
+         fec_reg: now,
+         hor_reg: currentHour,
+         usu_reg: debtRelief.registeringPersonCode!,
+         fec_reg_pag: now,
+         fec_pag_rea: currentDate,
+         tip_pagcuo: debtRelief.paymentType!,
+         emp_tra: creditInfoResponse.emp_tra,
+         emp_ven: creditInfoResponse.emp_ven,
+         fue_fin_pag: creditInfoResponse.fue_fin,
+         fec_ven_pag: dataPaymentNumber.paymentDate,
          dia_int_ec: 0,
-         tip_cam: 0,
-         mor_enc: 0,
-         cue_ban: "",
-         ori_tip_cam: "B",
-         swt_pag_ban: "S",
-         num_vou_ban: "abc12345",
-         id_pagcre: 0,
-         co_dispag: 0,
-         fe_propre: "2023-07-09",
-         pag_bol_int: 0,
-         pag_seg_prev: 0
-      };
-
+         tip_cam: 1.00,
+         cue_ban: null,
+         id_pagcre: dataProces.id_pagcre,
+         fe_propre: currentDate,
+         pag_seg_prev: debtRelief.preventionInsurance!,
+         cod_ds: debtRelief.idDocumentWF!,
+         usu_aut_con: debtRelief.authorizationPersonCode!
+      });
+      
       try {
-
-
-
-         const response = await axios.post('http://localhost:3000/own-credit-payments', creditPayment);
-         //console.log("response", response)
-
+         const response = await axios.post(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-credit-payments`, creditPayment);
       } catch (error: any) {
          console.log("Error details : ", error.response.data.error.details)
          throw new Error(error)
@@ -141,7 +93,49 @@ export class DebtReliefRepository implements DebtWaiverRepository {
       throw new Error("Method not implemented.");
    }
 
-   findAll(): Promise<DebtRelief[]> {
-      throw new Error("Method not implemented.");
+   async findAll(creditCode: string): Promise<DebtRelief[]> {
+      const whereFfilter = {
+         offset: 0,
+         limit: 500,
+         skip: 0,
+         order: "fec_pag desc",
+         where: {
+           cod_cre: creditCode,
+           lug_rec: "C5"
+         }
+       };
+
+       const encodedPath = encodeURIComponent(JSON.stringify(whereFfilter));
+
+       const {data: response} = await axios.get<any[]>(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-credit-payments?filter=`+encodedPath)
+
+       const debtReliefs = response.map(payment =>{
+         return new DebtRelief({
+            creditCode: payment.cod_cre,
+            ammount: payment.pago,
+            numberPayment: payment.num_cuo,
+            principalAmount: payment.pag_cap,
+            interestAmount: payment.pag_int,
+            lateFeeAmount: payment.pag_mor,
+            vehicleInsurance: payment.pag_seg,
+            lifeInsurance: payment.pag_seg_desgra,
+            igvInsurance: payment.pag_igv,
+            preventionInsurance: payment.pag_seg_prev,
+            collectionLocationCode: payment.lug_rec,
+            paymentType: payment.tip_pagcuo,
+            banckAccountCode: payment.cue_ban,
+            paymentDate: payment.fec_pag,
+            paymentHour: payment.hor_pag,
+            paymentValueDate: payment.fec_doc,
+            authorizationPersonCode: payment.usu_aut_con,
+            requestingPersonCode: null,
+            registeringPersonCode: payment.cod_per,
+            authorizationPersondocumentCode: payment.usu_reg,
+            idDocumentWF: payment.cod_ds,
+            idPayment: payment.id_pagcre,
+         })
+       })
+
+      return debtReliefs;
    }
 }

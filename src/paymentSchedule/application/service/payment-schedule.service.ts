@@ -4,6 +4,6 @@ export class PaymentScheduleService {
     constructor(private paymentScheduleRepository: PaymentScheduleRepository) { }
 
     findPaymentSchedule = async (creditCode: string) => {
-        return this.paymentScheduleRepository.find(creditCode);
+        return await this.paymentScheduleRepository.find(creditCode);
     }
 }

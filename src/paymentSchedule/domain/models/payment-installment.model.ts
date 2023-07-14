@@ -1,6 +1,7 @@
 export class PaymentInstallment {
 
     public readonly numberPayment: number;
+    public readonly paymentDate: string;
     public readonly principal: number;
     public readonly interest: number;
     public readonly vehicleInsurance: number;
@@ -17,6 +18,7 @@ export class PaymentInstallment {
 
     constructor(constructor: {
         numberPayment: number
+        paymentDate: string
         principal: number
         interest: number
         vehicleInsurance: number
@@ -32,6 +34,7 @@ export class PaymentInstallment {
         preventionInsuranceBalance: number
     }) {
         this.numberPayment = constructor.numberPayment;
+        this.paymentDate = constructor.paymentDate;
         this.principal = constructor.principal;
         this.interest = constructor.interest;
         this.vehicleInsurance = constructor.vehicleInsurance;

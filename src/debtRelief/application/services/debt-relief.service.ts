@@ -1,17 +1,15 @@
 import { PaymentScheduleService } from "../../../paymentSchedule/application/service/payment-schedule.service";
+import { PaymentInstallment } from "../../../paymentSchedule/domain/models/payment-installment.model";
 import { PaymentScheduleRepositoryHTTP } from "../../../paymentSchedule/infrastructure/repositories/payment-schedule.repository";
 
 export class DebtReliefService {
     constructor() { }
 
-    validateInstallment = async (creditCode: string, installmentNumber: number) => {
+    installmentAmounts = async (creditCode: string, installmentNumber: number): Promise<PaymentInstallment | undefined> => {
         const paymentScheduleRepositoryHTTP = new PaymentScheduleRepositoryHTTP();
         const paymentScheduleService = new PaymentScheduleService(paymentScheduleRepositoryHTTP);
-        const schedule = await paymentScheduleService.findPaymentSchedule(creditCode);
-
-
-
-        console.log("schedule 111", schedule)
-
+        const scheduleCredit = await paymentScheduleService.findPaymentSchedule(creditCode);
+        
+        return scheduleCredit.paymentInstallment.find((installment) => installment.numberPayment === installmentNumber)
     }
 }

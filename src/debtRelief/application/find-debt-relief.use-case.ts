@@ -1,11 +1,11 @@
 import { DebtRelief } from '../domain/model/debt-relief.model';
-import { DebtWaiverRepository } from '../domain/repositories/debt-waiver.repository';
+import { DebtReliefRepository } from '../domain/repositories/debt-relief.repository';
 
 export class FindDebtReliefUsecase {
-    constructor(private debtWaiverRepository: DebtWaiverRepository) { }
+    constructor(private debtReliefRepository: DebtReliefRepository) { }
 
-    execute = async (creditCode: string, paymentNumber: number, collectionLocationCode: string, idCorrelative: number): Promise<DebtRelief> => {
-        return await this.debtWaiverRepository.find(creditCode, paymentNumber, collectionLocationCode, idCorrelative);
+    findAll = async (creditCode: string): Promise<DebtRelief[]> => {
+        return await this.debtReliefRepository.findAll(creditCode);
     };
 
 }
