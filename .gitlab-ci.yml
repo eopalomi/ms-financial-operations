@@ -1,0 +1,61 @@
+image: tiangolo/docker-with-compose
+
+before_script:
+  - docker login registry.devacceso.com --username=docker -p=peladonerd
+
+variables:
+    # PORTDOCKER: 3325
+    PORTDOCKER: 3000
+    # PORTSALIDA: 3325
+    PORTSALIDA: 3185
+    IMAGENAME: lb-financial-operations
+    DOCKER_STACK: lb-financial-operations
+stages:
+  - build
+  - deploy-to-dev
+  - build-to-pro
+
+build:
+  stage: build
+  tags:
+    - build
+  only:
+    - develop
+  variables:
+    ENVDEPLOY: development
+  script:
+    - docker-compose build
+    - docker-compose push
+
+deploy-to-dev:
+  stage: deploy-to-dev
+  only:
+    - develop
+  tags:
+    - swarm-dev
+  variables:
+    ENVDEPLOY: development
+    NODO: dev
+  script:
+    # - docker-compose build -t lb-demo-ts .
+    # - docker push lb-demo-ts
+    - docker stack deploy -c docker-compose.yml $DOCKER_STACK --with-registry-auth
+
+build-to-pro:
+  stage: build-to-pro
+  only:
+    - master
+  tags:
+    - swarm-prod2022
+  variables:
+    #IMAGENAME: lb-simcro
+    ENVDEPLOY: production
+    NAME_BUILD : ${IMAGENAME}:${CI_PIPELINE_ID}
+    NODO: worker-prod
+  script:
+    - export
+    - docker build -t ${IMAGENAME} .
+    - docker tag ${IMAGENAME} registry.devacceso.com/${IMAGENAME}:${CI_PIPELINE_ID}
+    - docker push registry.devacceso.com/${IMAGENAME}:${CI_PIPELINE_ID}
+    - echo registry.devacceso.com/${NAME_BUILD}
+    - docker stack deploy -c docker-compose.yml ${IMAGENAME} --with-registry-auth

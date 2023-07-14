@@ -49,7 +49,7 @@ export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository 
 
         const encodedPayload = encodeURIComponent(JSON.stringify(objFilter));
 
-        const url = `http://localhost:3000/own-payment-schedules?filter=${encodedPayload}`;        
+        const url = `${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-payment-schedules?filter=${encodedPayload}`;        
         
         const { data: response } = await axios.get<any[]>(url);
 

@@ -77,10 +77,24 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
          usu_aut_con: debtRelief.authorizationPersonCode!
       });
       
+      const scheduleFields =  {
+         sal_cap: dataPaymentNumber.principalBalance - debtRelief.principalAmount!,
+         sal_int: dataPaymentNumber.interestBalance - debtRelief.interestAmount!,
+         sal_mor: dataPaymentNumber.feesbalance - debtRelief.lateFeeAmount!,
+         sal_seg: dataPaymentNumber.vehicleInsuranceBalance - debtRelief.vehicleInsurance!,
+         sal_seg_desgra: dataPaymentNumber.lifeInsuranceBalance - debtRelief.lifeInsurance!,
+         sal_seg_prev: dataPaymentNumber.preventionInsuranceBalance - debtRelief.preventionInsurance!,
+         sal_igv: dataPaymentNumber.igvInsuranceBalance - debtRelief.igvInsurance!,
+         fec_can: currentDate,
+         fec_can_cuo: currentDate
+       }
+
       try {
-         const response = await axios.post(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-credit-payments`, creditPayment);
+         const responsePost = await axios.post(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-credit-payments`, creditPayment);
+         const responsePatch = await axios.patch(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-payment-schedules/${debtRelief.creditCode}/${debtRelief.numberPayment}`, scheduleFields);
+
       } catch (error: any) {
-         console.log("Error details : ", error.response.data.error.details)
+         console.log("Error details : ", error.response.data.error.details);
          throw new Error(error)
       }
    }

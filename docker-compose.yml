@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  app:
+    tty: true
+    image: registry.devacceso.com/${IMAGENAME}:${CI_PIPELINE_ID}
+    # image: registry.devacceso.com/lb-simcro:1234412
+    build: .
+    # restart: "no"
+    restart: always
+    ports:
+      - "${PORTSALIDA}:${PORTDOCKER}"
+      # - "3105:3105"
+      #command: pm2-runtime server.config.js --env ${ENVDEPLOY}
+      #command: npm run start:${ENVDEPLOY}
+      # command: pm2 start ecosystem.config.js
+    command: bash -c "npm run start:${ENVDEPLOY}"
+    #command: bash -c "/usr/local/tomcat8_produccion/bin/startup.sh && tail -f /usr/local/tomcat8_produccion/logs/catalina.out"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://192.168.4.239:12201"
+        tag: ms-financial-operations
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.name == ${NODO}
+          # - node.labels.name == swarm-dev
