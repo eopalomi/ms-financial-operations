@@ -24,6 +24,8 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
       const currentDate: string = formatedDate(new Date(),'yyyy-mm-dd');
       const now: string = formatedDate(new Date(),'YYYY-MM-DD_hhmmss');
       const currentHour: string = formatedDate(new Date(),'hh:mm');
+      const postHttpPath = creditInfoResponse.il_admacc === true ? 'own-credit-payments' : 'transferred-credit-payments';
+      const patchHttpPath = creditInfoResponse.il_admacc === true ? 'own-payment-schedules' : 'transferred-payment-schedules';
 
       const creditPayment: creditPaymentInterfaceDTO = toPayment({
          cod_cre: debtRelief.creditCode!,
@@ -90,9 +92,8 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
        }
 
       try {
-         const responsePost = await axios.post(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-credit-payments`, creditPayment);
-         const responsePatch = await axios.patch(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-payment-schedules/${debtRelief.creditCode}/${debtRelief.numberPayment}`, scheduleFields);
-
+         await axios.post(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/${postHttpPath}`, creditPayment);
+         await axios.patch(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/${patchHttpPath}/${debtRelief.creditCode}/${debtRelief.numberPayment}`, scheduleFields);
       } catch (error: any) {
          console.log("Error details : ", error.response.data.error.details);
          throw new Error(error)

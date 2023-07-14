@@ -8,7 +8,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "prettier-format": "prettier --config .prettierrc src/**/*.ts --write",
     "dev": "cross-env NODE_ENV=local ts-node-dev src/app.ts",
-    "start:development": "pm2-runtime ecosystem.config.js --env development"
+    "start:development": "tsc && pm2-runtime ecosystem.config.js --env development"
   },
   "repository": {
     "type": "git",

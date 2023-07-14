@@ -47,14 +47,17 @@ export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository 
             }
         };
 
+        const {data: creditInfoResponse } = await axios.get(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/credit-information/${creditCode}`);
+        const getHttpPath = creditInfoResponse.il_admacc === true ? 'own-payment-schedules' : 'transferred-payment-schedules';
+
         const encodedPayload = encodeURIComponent(JSON.stringify(objFilter));
 
-        const url = `${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-payment-schedules?filter=${encodedPayload}`;        
+        const url = `${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/${getHttpPath}?filter=${encodedPayload}`;        
         
         const { data: response } = await axios.get<any[]>(url);
-
+        
         let paymentShedule = new PaymentShedule({
-            creditCode: response[0].cod_cre
+            creditCode: response[0]?.cod_cre
         });
 
         response.forEach((schedule) => {
@@ -75,7 +78,7 @@ export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository 
                 igvInsuranceBalance: parseFloat(schedule.sal_igv),
                 preventionInsuranceBalance: parseFloat(schedule.sal_seg_prev)
             })
-        })
+        });
         
         return paymentShedule;
     }
