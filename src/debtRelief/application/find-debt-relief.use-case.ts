@@ -7,5 +7,4 @@ export class FindDebtReliefUsecase {
     findAll = async (creditCode: string): Promise<DebtRelief[]> => {
         return await this.debtReliefRepository.findAll(creditCode);
     };
-
 }

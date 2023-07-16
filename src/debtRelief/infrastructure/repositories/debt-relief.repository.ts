@@ -1,37 +1,45 @@
-import { Pool } from "pg";
 import { DebtReliefRepository } from "../../domain/repositories/debt-relief.repository";
 import { DebtRelief } from "../../domain/model/debt-relief.model";
-import axios from 'axios';
 import { creditPaymentInterfaceDTO } from "../DTO/pag_cuo.dto";
 import { DebtReliefService } from "../../application/services/debt-relief.service";
 import { formatedDate } from "../../../commons/services/date-utils.services";
-import { toPayment } from "../services/payment.service";
+import { PaymentService } from "../services/payment.service";
+import { CreditService } from "../services/credit.service";
+import axios from 'axios';
 
 export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
-   constructor(private debtReliefService: DebtReliefService) {}
+   lb4Host : string;
+   paymentService: PaymentService;
+   creditService: CreditService;
+
+   constructor(private debtReliefService: DebtReliefService) {
+      this.lb4Host = `${process.env.HOST_NAME_LB}:${process.env.PORT_LB}`;
+      this.paymentService = new PaymentService()
+      this.creditService = new CreditService();
+   };
 
    async save(debtRelief: Partial<DebtRelief>): Promise<void> {
-      const {data: dataResponse } = await axios.get(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/receipt-number/C5/1`);
-      const {data: creditInfoResponse } = await axios.get(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/credit-information/${debtRelief.creditCode}`);
-      const {data: dataProces } = await axios.get(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/payment-process`);
-      
       const dataPaymentNumber = await this.debtReliefService.installmentAmounts(debtRelief.creditCode!, debtRelief.numberPayment!);
 
       if (!dataPaymentNumber){
          return;
       }
 
+      const idReceipt = await this.paymentService.getReceiptCode();
+      const creditInfoResponse = await this.creditService.getCreditInformation(debtRelief.creditCode!);
+      const idPayment = await this.paymentService.getIdPayment();
       const currentDate: string = formatedDate(new Date(),'yyyy-mm-dd');
       const now: string = formatedDate(new Date(),'YYYY-MM-DD_hhmmss');
       const currentHour: string = formatedDate(new Date(),'hh:mm');
+      
       const postHttpPath = creditInfoResponse.il_admacc === true ? 'own-credit-payments' : 'transferred-credit-payments';
       const patchHttpPath = creditInfoResponse.il_admacc === true ? 'own-payment-schedules' : 'transferred-payment-schedules';
 
-      const creditPayment: creditPaymentInterfaceDTO = toPayment({
+      const creditPayment: creditPaymentInterfaceDTO = this.paymentService.toPayment({
          cod_cre: debtRelief.creditCode!,
          num_cuo: debtRelief.numberPayment!,
          lug_rec: debtRelief.collectionLocationCode!,
-         num_ric: String(dataResponse.idReceipt),
+         num_ric: idReceipt,
          cod_int: String(creditInfoResponse.cod_int),
          fec_pag: String(debtRelief.paymentDate),
          hor_pag: String(debtRelief.paymentHour),
@@ -72,14 +80,14 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
          dia_int_ec: 0,
          tip_cam: 1.00,
          cue_ban: null,
-         id_pagcre: dataProces.id_pagcre,
+         id_pagcre: idPayment,
          fe_propre: currentDate,
          pag_seg_prev: debtRelief.preventionInsurance!,
          cod_ds: debtRelief.idDocumentWF!,
          usu_aut_con: debtRelief.authorizationPersonCode!
       });
       
-      const scheduleFields =  {
+      const fieldsForUpdate =  {
          sal_cap: dataPaymentNumber.principalBalance - debtRelief.principalAmount!,
          sal_int: dataPaymentNumber.interestBalance - debtRelief.interestAmount!,
          sal_mor: dataPaymentNumber.feesbalance - debtRelief.lateFeeAmount!,
@@ -92,15 +100,15 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
        }
 
       try {
-         await axios.post(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/${postHttpPath}`, creditPayment);
-         await axios.patch(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/${patchHttpPath}/${debtRelief.creditCode}/${debtRelief.numberPayment}`, scheduleFields);
+         await axios.post(`${this.lb4Host}/${postHttpPath}`, creditPayment);
+         await axios.patch(`${this.lb4Host}/${patchHttpPath}/${debtRelief.creditCode}/${debtRelief.numberPayment}`, fieldsForUpdate);
       } catch (error: any) {
          console.log("Error details : ", error.response.data.error.details);
          throw new Error(error)
       }
    }
 
-   cancel(): Promise<void> {
+   delete(creditCode: string, idPayment: number): Promise<void> {
       throw new Error("Method not implemented.");
    }
 
@@ -122,7 +130,7 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
 
        const encodedPath = encodeURIComponent(JSON.stringify(whereFfilter));
 
-       const {data: response} = await axios.get<any[]>(`${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/own-credit-payments?filter=`+encodedPath)
+       const {data: response} = await axios.get<any[]>(`${this.lb4Host}/own-credit-payments?filter=`+encodedPath)
 
        const debtReliefs = response.map(payment =>{
          return new DebtRelief({
