@@ -22,7 +22,7 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
       const dataPaymentNumber = await this.debtReliefService.installmentAmounts(debtRelief.creditCode!, debtRelief.numberPayment!);
 
       if (!dataPaymentNumber){
-         return;
+         throw new Error("payment number quota not found");
       }
 
       const idReceipt = await this.paymentService.getReceiptCode();
@@ -100,7 +100,7 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
        }
 
       try {
-         await axios.post(`${this.lb4Host}/${postHttpPath}`, creditPayment);
+         const res = await axios.post(`${this.lb4Host}/${postHttpPath}`, creditPayment);
          await axios.patch(`${this.lb4Host}/${patchHttpPath}/${debtRelief.creditCode}/${debtRelief.numberPayment}`, fieldsForUpdate);
       } catch (error: any) {
          console.log("Error details : ", error.response.data.error.details);
@@ -108,8 +108,21 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
       }
    }
 
-   delete(creditCode: string, idPayment: number): Promise<void> {
-      throw new Error("Method not implemented.");
+   async delete(creditCode: string, idPayment: number): Promise<void> {
+      const creditInfoResponse = await this.creditService.getCreditInformation(creditCode);
+      
+      const deletePath = creditInfoResponse.il_admacc === true ? 'own-credit-payments' : 'transferred-credit-payments';
+
+      try {
+         await axios.delete(`${this.lb4Host}/${deletePath}/${creditCode}`,{
+            params: {
+               id_pagcre: idPayment
+            }
+         });   
+      } catch (error: any) {
+         console.error(error.response)
+         throw new Error('an error ocurred while delete the payment');
+      }
    }
 
    async find(): Promise<DebtRelief> {

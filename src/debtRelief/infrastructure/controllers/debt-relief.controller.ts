@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import { CreateDebtReliefUsecase } from "../../application/create-debt-relief.use-case";
 import { DebtRelief } from "../../domain/model/debt-relief.model";
 import { FindDebtReliefUsecase } from "../../application/find-debt-relief.use-case";
+import { DeleteDebtReliefUseCase } from "../../application/delete-debt-relief.use-case";
 
 export class DebtReliefController {
-    constructor(private createDebtReliefUsecase: CreateDebtReliefUsecase, private findDebtReliefUsecase: FindDebtReliefUsecase) { }
+    constructor(private createDebtReliefUsecase: CreateDebtReliefUsecase, private findDebtReliefUsecase: FindDebtReliefUsecase, private deleteDebtReliefUseCase: DeleteDebtReliefUseCase) { }
 
     createDebtRelief = async (req: Request, res: Response) => {
         try {
@@ -55,6 +56,22 @@ export class DebtReliefController {
                 code: '00',
                 message: 'Debt relief was successfully found',
                 data: debtsRelief
+            });
+        } catch (error: any) {
+            throw new Error(error)
+        }
+    }
+
+    deleteDebtRelief = async (req: Request, res: Response) => {
+        const {creditCode} = req.params;
+        const {id_pagcre} = req.query;
+        
+        try {
+            const resp = await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
+            
+            res.status(204).json({
+                code: '00',
+                message: 'Debt relief was successfully deleted'
             });
         } catch (error: any) {
             throw new Error(error)
