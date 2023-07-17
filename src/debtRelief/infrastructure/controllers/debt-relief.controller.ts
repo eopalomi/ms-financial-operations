@@ -3,6 +3,8 @@ import { CreateDebtReliefUsecase } from "../../application/create-debt-relief.us
 import { DebtRelief } from "../../domain/model/debt-relief.model";
 import { FindDebtReliefUsecase } from "../../application/find-debt-relief.use-case";
 import { DeleteDebtReliefUseCase } from "../../application/delete-debt-relief.use-case";
+import { CreateDebtReliefDTO } from "../DTO/create-debt-relief.dto";
+import { validate } from "class-validator";
 
 export class DebtReliefController {
     constructor(private createDebtReliefUsecase: CreateDebtReliefUsecase, private findDebtReliefUsecase: FindDebtReliefUsecase, private deleteDebtReliefUseCase: DeleteDebtReliefUseCase) { }
@@ -11,9 +13,19 @@ export class DebtReliefController {
         try {
             const body = req.body;
 
+            const createDebtReliefDTO = new CreateDebtReliefDTO();
+            Object.assign(createDebtReliefDTO, body);
+
+            const errors = await validate(createDebtReliefDTO);
+
+            if (errors.length > 0) {
+                res.status(400).json({ errors });
+                return;
+            };
+            
             let debtReliefProps = new DebtRelief({
                 creditCode: body.creditCode,
-                ammount: body.ammount,
+                amount: body.amount,
                 numberPayment: body.numberPayment,
                 principalAmount: body.principalAmount,
                 interestAmount: body.interestAmount,
@@ -30,7 +42,6 @@ export class DebtReliefController {
                 paymentValueDate: body.paymentValueDate,
                 authorizationPersonCode: body.authorizationPersonCode,
                 requestingPersonCode: body.requestingPersonCode,
-                authorizationPersondocumentCode: body.authorizationPersondocumentCode,
                 registeringPersonCode: body.registeringPersonCode,
                 idDocumentWF: body.idDocumentWF,
                 idPayment: null

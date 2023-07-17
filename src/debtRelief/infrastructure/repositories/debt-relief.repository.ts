@@ -46,7 +46,7 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
          fec_pag: String(debtRelief.paymentDate),
          hor_pag: String(debtRelief.paymentHour),
          fec_doc: String(debtRelief.paymentValueDate),
-         pago: debtRelief.ammount!,
+         pago: debtRelief.amount!,
          pag_cap: debtRelief.principalAmount!,
          pag_int: debtRelief.interestAmount!,
          pag_seg: debtRelief.vehicleInsurance!,
@@ -150,7 +150,7 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
        const debtReliefs = response.map(payment =>{
          return new DebtRelief({
             creditCode: payment.cod_cre,
-            ammount: payment.pago,
+            amount: payment.pago,
             numberPayment: payment.num_cuo,
             principalAmount: payment.pag_cap,
             interestAmount: payment.pag_int,
@@ -166,9 +166,8 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
             paymentHour: payment.hor_pag,
             paymentValueDate: payment.fec_doc,
             authorizationPersonCode: payment.usu_aut_con,
-            requestingPersonCode: null,
+            requestingPersonCode: payment.usu_reg,
             registeringPersonCode: payment.cod_per,
-            authorizationPersondocumentCode: payment.usu_reg,
             idDocumentWF: payment.cod_ds,
             idPayment: payment.id_pagcre,
          })

@@ -1,6 +1,6 @@
 export class DebtRelief {
   public readonly creditCode: string;
-  public readonly ammount: number;
+  public readonly amount: number;
   public readonly numberPayment: number;
   public readonly principalAmount: number;
   public readonly interestAmount: number;
@@ -18,13 +18,12 @@ export class DebtRelief {
   public readonly authorizationPersonCode: string;
   public readonly requestingPersonCode: string | null;
   public readonly registeringPersonCode: string;
-  public readonly authorizationPersondocumentCode: string;
   public readonly idDocumentWF: number | null;
   private _idPayment: number | null;
 
   constructor(constructor: {
     creditCode: string,
-    ammount: number,
+    amount: number,
     numberPayment: number,
     principalAmount: number,
     interestAmount: number,
@@ -42,12 +41,11 @@ export class DebtRelief {
     authorizationPersonCode: string,
     requestingPersonCode: string | null,
     registeringPersonCode: string,
-    authorizationPersondocumentCode: string,
     idDocumentWF: number | null,
     idPayment: number | null,
   }) {
     this.creditCode = constructor.creditCode;
-    this.ammount = constructor.ammount;
+    this.amount = constructor.amount;
     this.numberPayment = constructor.numberPayment;
     this.principalAmount = constructor.principalAmount;
     this.interestAmount = constructor.interestAmount;
@@ -65,7 +63,6 @@ export class DebtRelief {
     this.authorizationPersonCode = constructor.authorizationPersonCode;
     this.requestingPersonCode = constructor.requestingPersonCode;
     this.registeringPersonCode = constructor.registeringPersonCode;
-    this.authorizationPersondocumentCode = constructor.authorizationPersondocumentCode;
     this.idDocumentWF = constructor.idDocumentWF;
     this._idPayment = constructor.idPayment;
   }
