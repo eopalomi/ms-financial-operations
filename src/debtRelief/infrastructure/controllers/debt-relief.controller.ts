@@ -3,7 +3,7 @@ import { CreateDebtReliefUsecase } from "../../application/create-debt-relief.us
 import { DebtRelief } from "../../domain/model/debt-relief.model";
 import { FindDebtReliefUsecase } from "../../application/find-debt-relief.use-case";
 import { DeleteDebtReliefUseCase } from "../../application/delete-debt-relief.use-case";
-import { CreateDebtReliefDTO } from "../DTO/create-debt-relief.dto";
+import { CreateDebtReliefDTO } from "../DTO/create-debt-relief-params.dto";
 import { validate } from "class-validator";
 
 export class DebtReliefController {
