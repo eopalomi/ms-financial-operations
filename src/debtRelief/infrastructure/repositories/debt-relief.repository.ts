@@ -132,11 +132,15 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
    }
 
    async findAll(creditCode: string): Promise<DebtRelief[]> {
+      const creditInfoResponse = await this.creditService.getCreditInformation(creditCode);
+      
+      const findPath = creditInfoResponse.il_admacc === true ? 'own-credit-payments' : 'transferred-credit-payments';
+
       const whereFfilter = {
          offset: 0,
          limit: 500,
          skip: 0,
-         order: "fec_pag desc",
+         order: "num_cuo asc",
          where: {
            cod_cre: creditCode,
            lug_rec: "C5"
@@ -145,7 +149,7 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
 
        const encodedPath = encodeURIComponent(JSON.stringify(whereFfilter));
 
-       const {data: response} = await axios.get<any[]>(`${this.lb4Host}/own-credit-payments?filter=`+encodedPath)
+       const {data: response} = await axios.get<any[]>(`${this.lb4Host}/${findPath}?filter=`+encodedPath)
 
        const debtReliefs = response.map(payment =>{
          return new DebtRelief({
