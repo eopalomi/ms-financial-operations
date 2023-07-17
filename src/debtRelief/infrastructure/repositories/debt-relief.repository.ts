@@ -28,6 +28,8 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
       const idReceipt = await this.paymentService.getReceiptCode();
       const creditInfoResponse = await this.creditService.getCreditInformation(debtRelief.creditCode!);
       const idPayment = await this.paymentService.getIdPayment();
+      debtRelief.idPayment = idPayment;
+
       const currentDate: string = formatedDate(new Date(),'yyyy-mm-dd');
       const now: string = formatedDate(new Date(),'YYYY-MM-DD_hhmmss');
       const currentHour: string = formatedDate(new Date(),'hh:mm');
@@ -97,10 +99,10 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
          sal_igv: dataPaymentNumber.igvInsuranceBalance - debtRelief.igvInsurance!,
          fec_can: currentDate,
          fec_can_cuo: currentDate
-       }
-
+      }
+      
       try {
-         const res = await axios.post(`${this.lb4Host}/${postHttpPath}`, creditPayment);
+         await axios.post(`${this.lb4Host}/${postHttpPath}`, creditPayment);
          await axios.patch(`${this.lb4Host}/${patchHttpPath}/${debtRelief.creditCode}/${debtRelief.numberPayment}`, fieldsForUpdate);
       } catch (error: any) {
          console.log("Error details : ", error.response.data.error.details);

@@ -32,14 +32,16 @@ export class DebtReliefController {
                 requestingPersonCode: body.requestingPersonCode,
                 authorizationPersondocumentCode: body.authorizationPersondocumentCode,
                 registeringPersonCode: body.registeringPersonCode,
-                idDocumentWF: body.idDocumentWF
+                idDocumentWF: body.idDocumentWF,
+                idPayment: null
             });
 
             await this.createDebtReliefUsecase.execute(debtReliefProps);
-
+            
             res.status(200).json({
                 code: '00',
-                message: 'Debt Relief created successfully'
+                message: 'Debt Relief created successfully',
+                data: debtReliefProps
             });
         } catch (error: any) {
             throw new Error(error)
