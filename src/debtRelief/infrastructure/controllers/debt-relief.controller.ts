@@ -55,7 +55,11 @@ export class DebtReliefController {
                 data: debtReliefProps
             });
         } catch (error: any) {
-            throw new Error(error)
+            res.status(400).json({
+                code: '99',
+                message: 'error',
+                data: error.message
+            });
         }
     };
 
