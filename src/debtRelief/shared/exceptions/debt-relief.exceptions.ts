@@ -5,6 +5,7 @@ type debtReliefErrorTypes =
     | 'invalidFormatPaymentValueDate'
     | 'creditCodeEmpty'
     | 'idPaymentIsEmpty'
+    | 'paymentNumberQuotaNotFound'
     | 'amountGreaterBalance';
 
 const exceptionsFactory = () => {

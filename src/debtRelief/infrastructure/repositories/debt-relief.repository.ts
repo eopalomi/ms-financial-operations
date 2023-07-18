@@ -6,6 +6,7 @@ import { formatedDate } from "../../../commons/services/date-utils.services";
 import { PaymentService } from "../services/payment.service";
 import { CreditService } from "../services/credit.service";
 import axios from 'axios';
+import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
 
 export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
    lb4Host: string;
@@ -18,11 +19,11 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
       this.creditService = new CreditService();
    };
 
-   async save(debtRelief: Partial<DebtRelief>): Promise<void> {
+   async save(debtRelief: DebtRelief): Promise<void> {
       const dataPaymentNumber = await this.debtReliefService.installmentAmounts(debtRelief.creditCode!, debtRelief.numberPayment!);
 
       if (!dataPaymentNumber) {
-         throw new Error("payment number quota not found");
+         throw new debtReliefException('paymentNumberQuotaNotFound', 'payment number quota not found');
       };
 
       const idReceipt = await this.paymentService.getReceiptCode();
@@ -38,24 +39,24 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
       const patchHttpPath = creditInfoResponse.il_admacc === true ? 'own-payment-schedules' : 'transferred-payment-schedules';
 
       const creditPayment: creditPaymentInterfaceDTO = this.paymentService.toPayment({
-         cod_cre: debtRelief.creditCode!,
-         num_cuo: debtRelief.numberPayment!,
-         lug_rec: debtRelief.collectionLocationCode!,
+         cod_cre: debtRelief.creditCode,
+         num_cuo: debtRelief.numberPayment,
+         lug_rec: debtRelief.collectionLocationCode,
          num_ric: idReceipt,
-         cod_int: String(creditInfoResponse.cod_int),
-         fec_pag: String(debtRelief.paymentDate),
-         hor_pag: String(debtRelief.paymentHour),
-         fec_doc: String(debtRelief.paymentValueDate),
-         pago: debtRelief.amount!,
-         pag_cap: debtRelief.principalAmount!,
-         pag_int: debtRelief.interestAmount!,
-         pag_seg: debtRelief.vehicleInsurance!,
-         pag_seg_desgra: debtRelief.lifeInsurance!,
-         pag_mor: debtRelief.lateFeeAmount!,
+         cod_int: creditInfoResponse.cod_int,
+         fec_pag: debtRelief.paymentDate,
+         hor_pag: debtRelief.paymentHour,
+         fec_doc: debtRelief.paymentValueDate,
+         pago: debtRelief.amount,
+         pag_cap: debtRelief.principalAmount,
+         pag_int: debtRelief.interestAmount,
+         pag_seg: debtRelief.vehicleInsurance,
+         pag_seg_desgra: debtRelief.lifeInsurance,
+         pag_mor: debtRelief.lateFeeAmount,
          pag_itf: 0,
-         pag_igv: debtRelief.igvInsurance!,
+         pag_igv: debtRelief.igvInsurance,
          dia_mor: 0,
-         ult_pag: debtRelief.paymentDate ? String(debtRelief.paymentDate) : null,
+         ult_pag: debtRelief.paymentDate,
          enc_cap: dataPaymentNumber.principalBalance,
          enc_int: dataPaymentNumber.interestBalance,
          enc_mor: dataPaymentNumber.feesbalance,
@@ -71,10 +72,10 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
          int_ven: dataPaymentNumber.interestBalance,
          fec_reg: now,
          hor_reg: currentHour,
-         usu_reg: debtRelief.registeringPersonCode!,
+         usu_reg: debtRelief.registeringPersonCode,
          fec_reg_pag: now,
          fec_pag_rea: currentDate,
-         tip_pagcuo: debtRelief.paymentType!,
+         tip_pagcuo: debtRelief.paymentType,
          emp_tra: creditInfoResponse.emp_tra,
          emp_ven: creditInfoResponse.emp_ven,
          fue_fin_pag: creditInfoResponse.fue_fin,
@@ -84,19 +85,19 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
          cue_ban: null,
          id_pagcre: idPayment,
          fe_propre: currentDate,
-         pag_seg_prev: debtRelief.preventionInsurance!,
-         cod_ds: debtRelief.idDocumentWF!,
-         usu_aut_con: debtRelief.authorizationPersonCode!
+         pag_seg_prev: debtRelief.preventionInsurance,
+         cod_ds: debtRelief.idDocumentWF,
+         usu_aut_con: debtRelief.authorizationPersonCode
       });
 
       const fieldsForUpdate = {
-         sal_cap: dataPaymentNumber.principalBalance - debtRelief.principalAmount!,
-         sal_int: dataPaymentNumber.interestBalance - debtRelief.interestAmount!,
-         sal_mor: dataPaymentNumber.feesbalance - debtRelief.lateFeeAmount!,
-         sal_seg: dataPaymentNumber.vehicleInsuranceBalance - debtRelief.vehicleInsurance!,
-         sal_seg_desgra: dataPaymentNumber.lifeInsuranceBalance - debtRelief.lifeInsurance!,
-         sal_seg_prev: dataPaymentNumber.preventionInsuranceBalance - debtRelief.preventionInsurance!,
-         sal_igv: dataPaymentNumber.igvInsuranceBalance - debtRelief.igvInsurance!,
+         sal_cap: dataPaymentNumber.principalBalance - debtRelief.principalAmount,
+         sal_int: dataPaymentNumber.interestBalance - debtRelief.interestAmount,
+         sal_mor: dataPaymentNumber.feesbalance - debtRelief.lateFeeAmount,
+         sal_seg: dataPaymentNumber.vehicleInsuranceBalance - debtRelief.vehicleInsurance,
+         sal_seg_desgra: dataPaymentNumber.lifeInsuranceBalance - debtRelief.lifeInsurance,
+         sal_seg_prev: dataPaymentNumber.preventionInsuranceBalance - debtRelief.preventionInsurance,
+         sal_igv: dataPaymentNumber.igvInsuranceBalance - debtRelief.igvInsurance,
          fec_can: currentDate,
          fec_can_cuo: currentDate
       }

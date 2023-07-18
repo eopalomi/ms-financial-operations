@@ -6,11 +6,11 @@ export class DebtReliefService {
     constructor() { }
 
     installmentAmounts = async (creditCode: string, installmentNumber: number): Promise<PaymentInstallment | undefined> => {
-        
+
         const paymentScheduleRepositoryHTTP = new PaymentScheduleRepositoryHTTP();
         const paymentScheduleService = new PaymentScheduleService(paymentScheduleRepositoryHTTP);
         const scheduleCredit = await paymentScheduleService.findPaymentSchedule(creditCode);
-        
+
         return scheduleCredit.paymentInstallment.find((installment) => installment.numberPayment === installmentNumber)
     }
 }
