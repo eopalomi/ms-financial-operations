@@ -3,6 +3,8 @@ type debtReliefErrorTypes =
     | 'invalidFormatPaymentHour'
     | 'invalidFormatPaymentDate'
     | 'invalidFormatPaymentValueDate'
+    | 'creditCodeEmpty'
+    | 'idPaymentIsEmpty'
     | 'amountGreaterBalance';
 
 const exceptionsFactory = () => {

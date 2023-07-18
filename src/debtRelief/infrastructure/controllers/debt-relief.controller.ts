@@ -8,7 +8,29 @@ import { validate } from "class-validator";
 import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
 
 export class DebtReliefController {
+    errorResponse = {
+        statusCode: 500,
+        response: {
+            code: '99',
+            message: 'Internal Server Error'
+        }
+    };
+
     constructor(private createDebtReliefUsecase: CreateDebtReliefUsecase, private findDebtReliefUsecase: FindDebtReliefUsecase, private deleteDebtReliefUseCase: DeleteDebtReliefUseCase) { }
+
+    private handleErrors(error: Error) {
+        if (error instanceof debtReliefException) {
+            this.errorResponse = {
+                statusCode: 400,
+                response: {
+                    code: '01',
+                    message: error.message
+                }
+            }
+        };
+
+        console.error(error);
+    }
 
     createDebtRelief = async (req: Request, res: Response) => {
         try {
@@ -36,32 +58,18 @@ export class DebtReliefController {
                 data: debtReliefProps
             });
         } catch (error) {
-            console.error(error);
+            this.handleErrors(error as Error);
 
-            let errorResponse = {
-                statusCode: 500,
-                response: {
-                    code: '99',
-                    message: 'Internal Server Error'
-                }
-            };
-
-            if (error instanceof debtReliefException) {
-                errorResponse = {
-                    statusCode: 400,
-                    response: {
-                        code: '01',
-                        message: error.message
-                    }
-                }
-            };
-
-            return res.status(errorResponse.statusCode).json(errorResponse.response);
+            return res.status(this.errorResponse.statusCode).json(this.errorResponse.response);
         }
     };
 
-    findDebtRelief = async (req: Request, res: Response) => {
+    findDebtReliefs = async (req: Request, res: Response) => {
         const { creditCode } = req.params;
+
+        if (!creditCode) {
+            throw new debtReliefException('creditCodeEmpty', 'Credit code is empty');
+        };
 
         try {
             const debtsRelief = await this.findDebtReliefUsecase.findAll(creditCode);
@@ -72,27 +80,9 @@ export class DebtReliefController {
                 data: debtsRelief
             });
         } catch (error) {
-            console.error(error);
+            this.handleErrors(error as Error);
 
-            let errorResponse = {
-                statusCode: 500,
-                response: {
-                    code: '99',
-                    message: 'Internal Server Error'
-                }
-            };
-
-            if (error instanceof debtReliefException) {
-                errorResponse = {
-                    statusCode: 400,
-                    response: {
-                        code: '01',
-                        message: error.message
-                    }
-                }
-            };
-
-            return res.status(errorResponse.statusCode).json(errorResponse.response);
+            return res.status(this.errorResponse.statusCode).json(this.errorResponse.response);
         }
     }
 
@@ -101,34 +91,24 @@ export class DebtReliefController {
         const { id_pagcre } = req.query;
 
         try {
-            const resp = await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
+            if (!creditCode) {
+                throw new debtReliefException('creditCodeEmpty', 'Credit code is empty');
+            };
+
+            if (!id_pagcre) {
+                throw new debtReliefException('idPaymentIsEmpty', 'payment id is empty');
+            };
+
+            await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
 
             return res.status(204).json({
                 code: '00',
                 message: 'Debt relief was successfully deleted'
             });
         } catch (error) {
-            console.error(error);
+            this.handleErrors(error as Error);
 
-            let errorResponse = {
-                statusCode: 500,
-                response: {
-                    code: '99',
-                    message: 'Internal Server Error'
-                }
-            };
-
-            if (error instanceof debtReliefException) {
-                errorResponse = {
-                    statusCode: 400,
-                    response: {
-                        code: '01',
-                        message: error.message
-                    }
-                }
-            };
-
-            return res.status(errorResponse.statusCode).json(errorResponse.response);
+            return res.status(this.errorResponse.statusCode).json(this.errorResponse.response);
         }
     }
 }

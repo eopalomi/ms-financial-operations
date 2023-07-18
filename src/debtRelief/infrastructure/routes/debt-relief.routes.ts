@@ -16,7 +16,7 @@ const deleteDebtReliefUsecase = new DeleteDebtReliefUseCase(debtReliefRepository
 const debtController = new DebtReliefController(debtReliefUsecase, findDebtReliefUsecase, deleteDebtReliefUsecase);
 
 routes.post('/debt-relief', debtController.createDebtRelief);
-routes.get('/debt-relief/:creditCode', debtController.findDebtRelief);
+routes.get('/debt-relief/:creditCode', debtController.findDebtReliefs);
 routes.delete('/debt-relief/:creditCode', debtController.deleteDebtRelief);
 
 export default routes;

@@ -105,7 +105,7 @@ export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
          await axios.post(`${this.lb4Host}/${postHttpPath}`, creditPayment);
          await axios.patch(`${this.lb4Host}/${patchHttpPath}/${debtRelief.creditCode}/${debtRelief.numberPayment}`, fieldsForUpdate);
       } catch (error: any) {
-         console.log("Error details : ", error.response.data.error.details);
+         console.error("Error details : ", error.response.data.error.details);
          throw new Error(error)
       }
    }

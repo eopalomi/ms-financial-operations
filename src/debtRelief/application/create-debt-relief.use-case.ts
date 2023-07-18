@@ -16,6 +16,7 @@ export class CreateDebtReliefUsecase {
     if (!amounts) {
       throw new Error("installment number not found");
     }
+
     if (
       debtRelief.principalAmount > amounts.principalBalance ||
       debtRelief.interestAmount > amounts.interestBalance ||
