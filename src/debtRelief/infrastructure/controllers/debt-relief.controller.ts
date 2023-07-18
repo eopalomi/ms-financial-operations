@@ -56,17 +56,17 @@ export class DebtReliefController {
                 }
             };
 
-            res.status(errorResponse.statusCode).json(errorResponse.response);
+            return res.status(errorResponse.statusCode).json(errorResponse.response);
         }
     };
 
     findDebtRelief = async (req: Request, res: Response) => {
-        try {
-            const { creditCode } = req.params;
+        const { creditCode } = req.params;
 
+        try {
             const debtsRelief = await this.findDebtReliefUsecase.findAll(creditCode);
 
-            res.status(200).json({
+            return res.status(200).json({
                 code: '00',
                 message: 'Debt relief was successfully found',
                 data: debtsRelief
@@ -92,7 +92,7 @@ export class DebtReliefController {
                 }
             };
 
-            res.status(errorResponse.statusCode).json(errorResponse.response);
+            return res.status(errorResponse.statusCode).json(errorResponse.response);
         }
     }
 
@@ -103,7 +103,7 @@ export class DebtReliefController {
         try {
             const resp = await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
 
-            res.status(204).json({
+            return res.status(204).json({
                 code: '00',
                 message: 'Debt relief was successfully deleted'
             });
@@ -128,7 +128,7 @@ export class DebtReliefController {
                 }
             };
 
-            res.status(errorResponse.statusCode).json(errorResponse.response);
+            return res.status(errorResponse.statusCode).json(errorResponse.response);
         }
     }
 }
