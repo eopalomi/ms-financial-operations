@@ -5,6 +5,7 @@ import { FindDebtReliefUsecase } from "../../application/find-debt-relief.use-ca
 import { DeleteDebtReliefUseCase } from "../../application/delete-debt-relief.use-case";
 import { CreateDebtReliefDTO } from "../DTO/create-debt-relief-params.dto";
 import { validate } from "class-validator";
+import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
 
 export class DebtReliefController {
     constructor(private createDebtReliefUsecase: CreateDebtReliefUsecase, private findDebtReliefUsecase: FindDebtReliefUsecase, private deleteDebtReliefUseCase: DeleteDebtReliefUseCase) { }
@@ -13,85 +14,121 @@ export class DebtReliefController {
         try {
             const body = req.body;
 
-            const createDebtReliefDTO = new CreateDebtReliefDTO();
-            Object.assign(createDebtReliefDTO, body);
+            const createDebtReliefDTO = Object.assign(new CreateDebtReliefDTO(), body);
 
             const errors = await validate(createDebtReliefDTO);
 
             if (errors.length > 0) {
-                res.status(400).json({ errors });
-                return;
+                return res.status(400).json({ errors });
             };
-            
+
             let debtReliefProps = new DebtRelief({
-                creditCode: body.creditCode,
-                amount: body.amount,
-                numberPayment: body.numberPayment,
-                principalAmount: body.principalAmount,
-                interestAmount: body.interestAmount,
-                lateFeeAmount: body.lateFeeAmount,
-                vehicleInsurance: body.vehicleInsurance,
-                lifeInsurance: body.lifeInsurance,
-                igvInsurance: body.igvInsurance,
-                preventionInsurance: body.preventionInsurance,
-                collectionLocationCode: body.collectionLocationCode,
-                paymentType: body.paymentType,
-                banckAccountCode: body.banckAccountCode,
-                paymentDate: body.paymentDate,
-                paymentHour: body.paymentHour,
-                paymentValueDate: body.paymentValueDate,
-                authorizationPersonCode: body.authorizationPersonCode,
-                requestingPersonCode: body.requestingPersonCode,
-                registeringPersonCode: body.registeringPersonCode,
-                idDocumentWF: body.idDocumentWF,
+                ...createDebtReliefDTO,
+                banckAccountCode: null,
                 idPayment: null
             });
 
             await this.createDebtReliefUsecase.execute(debtReliefProps);
-            
-            res.status(200).json({
+
+            return res.status(200).json({
                 code: '00',
                 message: 'Debt Relief created successfully',
                 data: debtReliefProps
             });
-        } catch (error: any) {
-            res.status(400).json({
-                code: '99',
-                message: 'error',
-                data: error.message
-            });
+        } catch (error) {
+            console.error(error);
+
+            let errorResponse = {
+                statusCode: 500,
+                response: {
+                    code: '99',
+                    message: 'Internal Server Error'
+                }
+            };
+
+            if (error instanceof debtReliefException) {
+                errorResponse = {
+                    statusCode: 400,
+                    response: {
+                        code: '01',
+                        message: error.message
+                    }
+                }
+            };
+
+            res.status(errorResponse.statusCode).json(errorResponse.response);
         }
     };
 
-    findDebtRelief = async (req: Request, res: Response) =>{
+    findDebtRelief = async (req: Request, res: Response) => {
         try {
             const { creditCode } = req.params;
 
-            const debtsRelief =  await this.findDebtReliefUsecase.findAll(creditCode);
+            const debtsRelief = await this.findDebtReliefUsecase.findAll(creditCode);
 
             res.status(200).json({
                 code: '00',
                 message: 'Debt relief was successfully found',
                 data: debtsRelief
             });
-        } catch (error: any) {
-            throw new Error(error)
+        } catch (error) {
+            console.error(error);
+
+            let errorResponse = {
+                statusCode: 500,
+                response: {
+                    code: '99',
+                    message: 'Internal Server Error'
+                }
+            };
+
+            if (error instanceof debtReliefException) {
+                errorResponse = {
+                    statusCode: 400,
+                    response: {
+                        code: '01',
+                        message: error.message
+                    }
+                }
+            };
+
+            res.status(errorResponse.statusCode).json(errorResponse.response);
         }
     }
 
     deleteDebtRelief = async (req: Request, res: Response) => {
-        const {creditCode} = req.params;
-        const {id_pagcre} = req.query;
-        
+        const { creditCode } = req.params;
+        const { id_pagcre } = req.query;
+
         try {
             const resp = await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
-            
+
             res.status(204).json({
                 code: '00',
                 message: 'Debt relief was successfully deleted'
             });
-        } catch (error: any) {
-            throw new Error(error)
+        } catch (error) {
+            console.error(error);
+
+            let errorResponse = {
+                statusCode: 500,
+                response: {
+                    code: '99',
+                    message: 'Internal Server Error'
+                }
+            };
+
+            if (error instanceof debtReliefException) {
+                errorResponse = {
+                    statusCode: 400,
+                    response: {
+                        code: '01',
+                        message: error.message
+                    }
+                }
+            };
+
+            res.status(errorResponse.statusCode).json(errorResponse.response);
         }
     }
 }

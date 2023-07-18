@@ -1,8 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { PaymentShedule } from "../../domain/models/payment-schedule.model";
 import { PaymentScheduleRepository } from '../../domain/repositories/payment-schedule.repository';
-import { PaymentInstallment } from '../../domain/models/payment-installment.model';
-import { forEach } from 'lodash';
 
 export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository {
 

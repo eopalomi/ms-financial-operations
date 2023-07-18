@@ -1,5 +1,6 @@
 import { DebtRelief } from '../domain/model/debt-relief.model';
 import { DebtReliefRepository } from '../domain/repositories/debt-relief.repository';
+import { debtReliefException } from '../shared/exceptions/debt-relief.exceptions';
 import { DebtReliefService } from './services/debt-relief.service';
 
 export class CreateDebtReliefUsecase {
@@ -24,7 +25,7 @@ export class CreateDebtReliefUsecase {
       debtRelief.igvInsurance > amounts.igvInsuranceBalance ||
       debtRelief.preventionInsurance > amounts.preventionInsuranceBalance
     ) {
-      throw new Error("amount greater than installment balance");
+      throw new debtReliefException('amountGreaterBalance', 'amount is greater than installment balance');
     }
 
     await this.debtWaiverRepository.save(debtRelief);

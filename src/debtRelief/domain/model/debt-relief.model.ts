@@ -1,3 +1,5 @@
+import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
+
 export class DebtRelief {
   public readonly creditCode: string;
   public readonly amount: number;
@@ -12,9 +14,9 @@ export class DebtRelief {
   public readonly collectionLocationCode: string;
   public readonly paymentType: string | null;
   public readonly banckAccountCode: string | null;
-  public readonly paymentDate: Date;
-  public readonly paymentHour: Date;
-  public readonly paymentValueDate: Date;
+  public readonly paymentDate: string;
+  public readonly paymentHour: string;
+  public readonly paymentValueDate: string;
   public readonly authorizationPersonCode: string;
   public readonly requestingPersonCode: string | null;
   public readonly registeringPersonCode: string;
@@ -34,10 +36,10 @@ export class DebtRelief {
     preventionInsurance: number,
     collectionLocationCode: string,
     paymentType: string | null,
-    banckAccountCode: string,
-    paymentDate: Date,
-    paymentHour: Date,
-    paymentValueDate: Date,
+    banckAccountCode: string | null,
+    paymentDate: string,
+    paymentHour: string,
+    paymentValueDate: string,
     authorizationPersonCode: string,
     requestingPersonCode: string | null,
     registeringPersonCode: string,
@@ -65,9 +67,29 @@ export class DebtRelief {
     this.registeringPersonCode = constructor.registeringPersonCode;
     this.idDocumentWF = constructor.idDocumentWF;
     this._idPayment = constructor.idPayment;
+
+    this.validate();
   }
-  
-  set idPayment(idPayment: number | null ){
+
+  set idPayment(idPayment: number | null) {
     this._idPayment = idPayment;
   }
+
+  validate() {
+    const regexValHour = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    const regexValDate = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (!regexValHour.test(this.paymentHour)) {
+      throw new debtReliefException('invalidFormatPaymentHour', 'Invalid format payment Hour');
+    }
+
+    if (!regexValDate.test(this.paymentDate)) {
+      throw new debtReliefException('invalidFormatPaymentDate', 'Invalid format payment date');
+    }
+
+    if (!regexValDate.test(this.paymentValueDate)) {
+      throw new debtReliefException('invalidFormatPaymentValueDate', 'Invalid format payment value date');
+    }
+  }
+
 }
