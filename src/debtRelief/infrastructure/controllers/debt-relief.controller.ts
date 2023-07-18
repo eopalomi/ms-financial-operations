@@ -14,7 +14,7 @@ export class DebtReliefController {
         try {
             const body = req.body;
 
-            const createDebtReliefDTO = Object.assign(new CreateDebtReliefDTO(), body);
+            const createDebtReliefDTO: CreateDebtReliefDTO = Object.assign(new CreateDebtReliefDTO(), body);
 
             const errors = await validate(createDebtReliefDTO);
 
