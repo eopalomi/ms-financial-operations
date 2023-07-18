@@ -3,13 +3,14 @@ import { PaymentInstallment } from "../../../paymentSchedule/domain/models/payme
 import { PaymentScheduleRepositoryHTTP } from "../../../paymentSchedule/infrastructure/repositories/payment-schedule.repository";
 
 export class DebtReliefService {
-    constructor() { }
+    paymentScheduleService: PaymentScheduleService;
+
+    constructor() {
+        this.paymentScheduleService = new PaymentScheduleService(new PaymentScheduleRepositoryHTTP());
+    }
 
     installmentAmounts = async (creditCode: string, installmentNumber: number): Promise<PaymentInstallment | undefined> => {
-
-        const paymentScheduleRepositoryHTTP = new PaymentScheduleRepositoryHTTP();
-        const paymentScheduleService = new PaymentScheduleService(paymentScheduleRepositoryHTTP);
-        const scheduleCredit = await paymentScheduleService.findPaymentSchedule(creditCode);
+        const scheduleCredit = await this.paymentScheduleService.findPaymentSchedule(creditCode);
 
         return scheduleCredit.paymentInstallment.find((installment) => installment.numberPayment === installmentNumber)
     }
