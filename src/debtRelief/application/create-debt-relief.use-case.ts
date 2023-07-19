@@ -31,4 +31,5 @@ export class CreateDebtReliefUsecase {
 
     await this.debtWaiverRepository.save(debtRelief);
   };
+
 }

@@ -58,23 +58,25 @@ export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository 
         });
 
         response.forEach((schedule) => {
-            paymentShedule.addInstallmentNumber({
-                numberPayment: parseInt(schedule.num_cuo),
-                paymentDate: String(schedule.fec_ven).substring(0, 10),
-                principal: parseFloat(schedule.capital),
-                interest: parseFloat(schedule.interes),
-                vehicleInsurance: parseFloat(schedule.cta_seg),
-                lifeInsurance: parseFloat(schedule.cta_seg_desgra),
-                igvInsurance: parseFloat(schedule.cta_igv),
-                preventionInsurance: parseFloat(schedule.cta_seg_prev),
-                principalBalance: parseFloat(schedule.sal_cap ?? 0.00),
-                interestBalance: parseFloat(schedule.sal_int ?? 0.00),
-                feesbalance: parseFloat(schedule.sal_mor ?? 0.00),
-                vehicleInsuranceBalance: parseFloat(schedule.sal_seg ?? 0.00),
-                lifeInsuranceBalance: parseFloat(schedule.sal_seg_desgra ?? 0.00),
-                igvInsuranceBalance: parseFloat(schedule.sal_igv ?? 0.00),
-                preventionInsuranceBalance: parseFloat(schedule.sal_seg_prev ?? 0.00)
-            })
+            if (parseInt(schedule.num_cuo) > 0) {
+                paymentShedule.addInstallmentNumber({
+                    numberPayment: parseInt(schedule.num_cuo),
+                    paymentDate: String(schedule.fec_ven).substring(0, 10),
+                    principal: parseFloat(schedule.capital),
+                    interest: parseFloat(schedule.interes),
+                    vehicleInsurance: parseFloat(schedule.cta_seg),
+                    lifeInsurance: parseFloat(schedule.cta_seg_desgra),
+                    igvInsurance: parseFloat(schedule.cta_igv),
+                    preventionInsurance: parseFloat(schedule.cta_seg_prev),
+                    principalBalance: parseFloat(schedule.sal_cap ?? 0.00),
+                    interestBalance: parseFloat(schedule.sal_int ?? 0.00),
+                    feesbalance: parseFloat(schedule.sal_mor ?? 0.00),
+                    vehicleInsuranceBalance: parseFloat(schedule.sal_seg ?? 0.00),
+                    lifeInsuranceBalance: parseFloat(schedule.sal_seg_desgra ?? 0.00),
+                    igvInsuranceBalance: parseFloat(schedule.sal_igv ?? 0.00),
+                    preventionInsuranceBalance: parseFloat(schedule.sal_seg_prev ?? 0.00)
+                });
+            };
         });
 
         return paymentShedule;

@@ -4,8 +4,11 @@ import { DebtRelief } from "../../domain/model/debt-relief.model";
 import { FindDebtReliefUsecase } from "../../application/find-debt-relief.use-case";
 import { DeleteDebtReliefUseCase } from "../../application/delete-debt-relief.use-case";
 import { CreateDebtReliefDTO } from "../DTO/create-debt-relief-params.dto";
-import { validate } from "class-validator";
+import { ValidationError, validate } from "class-validator";
 import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
+import { map } from "lodash";
+import { SimulateDebtReliefUsecase } from "../../application/simulate-debt-relief.use-case";
+import { SimulateDebtReliefParamsDTO } from "../DTO/simulate-debt-relief-params.dto";
 
 export class DebtReliefController {
     private errorResponse = {
@@ -19,7 +22,8 @@ export class DebtReliefController {
     constructor(
         private createDebtReliefUsecase: CreateDebtReliefUsecase,
         private findDebtReliefUsecase: FindDebtReliefUsecase,
-        private deleteDebtReliefUseCase: DeleteDebtReliefUseCase
+        private deleteDebtReliefUseCase: DeleteDebtReliefUseCase,
+        private simulateDebtReliefUsecase: SimulateDebtReliefUsecase,
     ) { }
 
     createDebtRelief = async (req: Request, res: Response) => {
@@ -96,6 +100,34 @@ export class DebtReliefController {
             return this.sendResponse(res, this.errorResponse.statusCode, this.errorResponse.response);
         }
     }
+
+    simulateDebtReliefs = async (req: Request, res: Response) => {
+        try {
+            const requestBody = req.body;
+
+            if (!Array.isArray(requestBody)) {
+                throw new debtReliefException('invalidArrayBodyRequest', 'invalid format body request, must be an array');
+            }
+
+            const payments: SimulateDebtReliefParamsDTO[] = requestBody.map((payment) => Object.assign(new SimulateDebtReliefParamsDTO(), payment))
+            const validateErrors: ValidationError[][] = await Promise.all(payments.map((payment) => validate(payment)));
+
+            if (validateErrors.some((errors) => errors.length > 0)) {
+                return res.status(400).json({ message: 'Invalid body format', errors: validateErrors[0] });
+            }
+
+            const debtReliefs = await this.simulateDebtReliefUsecase.execute(payments)
+
+            return this.sendResponse(res, 200, {
+                code: '00',
+                message: 'Debt Relief simulate successfully',
+                data: debtReliefs
+            });
+        } catch (error) {
+            this.handleErrors(error as Error);
+            return this.sendResponse(res, this.errorResponse.statusCode, this.errorResponse.response);
+        }
+    };
 
     private handleErrors(error: Error) {
         if (error instanceof debtReliefException) {

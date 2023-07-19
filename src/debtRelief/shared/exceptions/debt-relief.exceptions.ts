@@ -6,6 +6,7 @@ type debtReliefErrorTypes =
     | 'creditCodeEmpty'
     | 'idPaymentIsEmpty'
     | 'paymentNumberQuotaNotFound'
+    | 'invalidArrayBodyRequest'
     | 'amountGreaterBalance';
 
 const exceptionsFactory = () => {

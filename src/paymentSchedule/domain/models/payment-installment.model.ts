@@ -8,13 +8,13 @@ export class PaymentInstallment {
     public readonly lifeInsurance: number;
     public readonly igvInsurance: number;
     public readonly preventionInsurance: number;
-    public readonly principalBalance: number;
-    public readonly interestBalance: number;
-    public readonly feesbalance: number;
-    public readonly vehicleInsuranceBalance: number;
-    public readonly lifeInsuranceBalance: number;
-    public readonly igvInsuranceBalance: number;
-    public readonly preventionInsuranceBalance: number;
+    public principalBalance: number;
+    public interestBalance: number;
+    public feesbalance: number;
+    public vehicleInsuranceBalance: number;
+    public lifeInsuranceBalance: number;
+    public igvInsuranceBalance: number;
+    public preventionInsuranceBalance: number;
 
     constructor(constructor: {
         numberPayment: number
