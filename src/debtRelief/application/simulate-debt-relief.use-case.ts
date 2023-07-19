@@ -1,11 +1,11 @@
 import { DebtRelief } from "../domain/model/debt-relief.model";
-import { DebtReliefRepository } from "../domain/repositories/debt-relief.repository";
 import { SimulateDebtReliefParamsDTO } from "../infrastructure/DTO/simulate-debt-relief-params.dto";
 import { DebtReliefService } from './services/debt-relief.service';
 
 export class SimulateDebtReliefUsecase {
     debtReliefService: DebtReliefService;
-    constructor(private debtReliefRepository: DebtReliefRepository) {
+
+    constructor() {
         this.debtReliefService = new DebtReliefService();
     }
 
