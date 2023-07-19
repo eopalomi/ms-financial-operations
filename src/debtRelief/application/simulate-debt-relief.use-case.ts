@@ -30,14 +30,15 @@ export class SimulateDebtReliefUsecase {
                     };
 
                     const updateAmountBalance = (installmentBalance: number, paymentType: keyof typeof debtReliefPayments) => {
+                        // console.log(paymentType, " - installmentBalance :", installmentBalance, " / amountBalance: S/ ", amountBalance)
                         if (amountBalance > installmentBalance) {
                             amountBalance -= +installmentBalance.toFixed(2);
                             debtReliefPayments[paymentType] = +installmentBalance.toFixed(2);
                             installmentBalance = 0.00;
                         } else {
-                            amountBalance = 0.00;
                             debtReliefPayments[paymentType] = +amountBalance.toFixed(2);
                             installmentBalance -= +amountBalance.toFixed(2);
+                            amountBalance = 0.00;
                         }
                     };
 
