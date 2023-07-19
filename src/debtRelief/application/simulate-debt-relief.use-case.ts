@@ -15,8 +15,9 @@ export class SimulateDebtReliefUsecase {
         const paymentPromises = creditPayments.map(async (payment) => {
             let paymentSchedule = await this.debtReliefService.paymentSchedule(payment.creditCode);
 
-            paymentSchedule?.paymentInstallment.reduce((amountBalance, installment) => {
+            if (!paymentSchedule) return;
 
+            paymentSchedule.paymentInstallment.reduce((amountBalance, installment) => {
                 if (amountBalance > 0) {
                     let debtReliefPayments = {
                         principalAmount: 0.00,
@@ -28,78 +29,31 @@ export class SimulateDebtReliefUsecase {
                         preventionInsurance: 0.00
                     };
 
-                    if (amountBalance > installment.principalBalance) {
-                        amountBalance -= +installment.principalBalance.toFixed(2);
-                        debtReliefPayments.principalAmount = +installment.principalBalance.toFixed(2);
-                        installment.principalBalance = 0.00;
-                    } else {
-                        installment.principalBalance -= +amountBalance.toFixed(2);
-                        debtReliefPayments.principalAmount = +amountBalance.toFixed(2);
-                        amountBalance = 0.00;
-                    }
+                    const updateAmountBalance = (installmentBalance: number, paymentType: keyof typeof debtReliefPayments) => {
+                        if (amountBalance > installmentBalance) {
+                            amountBalance -= +installmentBalance.toFixed(2);
+                            debtReliefPayments[paymentType] = +installmentBalance.toFixed(2);
+                            installmentBalance = 0.00;
+                        } else {
+                            amountBalance = 0.00;
+                            debtReliefPayments[paymentType] = +amountBalance.toFixed(2);
+                            installmentBalance -= +amountBalance.toFixed(2);
+                        }
+                    };
 
-                    if (amountBalance > installment.interestBalance) {
-                        amountBalance -= +installment.interestBalance.toFixed(2);
-                        debtReliefPayments.interestAmount = +installment.interestBalance.toFixed(2);
-                        installment.interestBalance = 0.00;
-                    } else {
-                        installment.interestBalance -= +amountBalance.toFixed(2);
-                        debtReliefPayments.interestAmount = +amountBalance.toFixed(2);
-                        amountBalance = 0.00;
-                    }
-
-                    if (amountBalance > installment.feesbalance) {
-                        amountBalance -= +installment.feesbalance.toFixed(2);
-                        debtReliefPayments.lateFeeAmount = +installment.feesbalance.toFixed(2);
-                        installment.feesbalance = 0.00;
-                    } else {
-                        installment.feesbalance -= +amountBalance.toFixed(2);
-                        debtReliefPayments.lateFeeAmount = +amountBalance.toFixed(2);
-                        amountBalance = 0.00;
-                    }
-
-                    if (amountBalance > installment.vehicleInsuranceBalance) {
-                        amountBalance -= +installment.vehicleInsuranceBalance.toFixed(2);
-                        debtReliefPayments.vehicleInsurance = +installment.vehicleInsuranceBalance.toFixed(2);
-                        installment.vehicleInsuranceBalance = 0.00;
-                    } else {
-                        installment.vehicleInsuranceBalance -= +amountBalance.toFixed(2);
-                        debtReliefPayments.vehicleInsurance = +amountBalance.toFixed(2);
-                        amountBalance = 0.00;
-                    }
-
-                    if (amountBalance > installment.lifeInsuranceBalance) {
-                        amountBalance -= +installment.lifeInsuranceBalance.toFixed(2);
-                        debtReliefPayments.lifeInsurance = +installment.lifeInsuranceBalance.toFixed(2);
-                        installment.lifeInsuranceBalance = 0.00;
-                    } else {
-                        installment.lifeInsuranceBalance -= +amountBalance.toFixed(2);
-                        debtReliefPayments.lifeInsurance = +amountBalance.toFixed(2);
-                        amountBalance = 0.00;
-                    }
-
-                    if (amountBalance > installment.preventionInsuranceBalance) {
-                        amountBalance -= +installment.preventionInsuranceBalance.toFixed(2);
-                        debtReliefPayments.preventionInsurance = +installment.preventionInsuranceBalance.toFixed(2);
-                        installment.preventionInsuranceBalance = 0.00;
-                    } else {
-                        installment.preventionInsuranceBalance -= +amountBalance.toFixed(2);
-                        debtReliefPayments.preventionInsurance = +amountBalance.toFixed(2);
-                        amountBalance = 0.00;
-                    }
-
+                    updateAmountBalance(installment.principalBalance, 'principalAmount')
+                    updateAmountBalance(installment.interestBalance, 'interestAmount')
+                    updateAmountBalance(installment.feesbalance, 'lateFeeAmount')
+                    updateAmountBalance(installment.vehicleInsuranceBalance, 'vehicleInsurance')
+                    updateAmountBalance(installment.lifeInsuranceBalance, 'lifeInsurance')
+                    updateAmountBalance(installment.igvInsuranceBalance, 'igvInsurance')
+                    updateAmountBalance(installment.preventionInsuranceBalance, 'preventionInsurance')
 
                     payments.push(new DebtRelief({
                         creditCode: payment.creditCode,
                         amount: payment.amount,
                         numberPayment: installment.numberPayment,
-                        principalAmount: debtReliefPayments.principalAmount,
-                        interestAmount: debtReliefPayments.interestAmount,
-                        lateFeeAmount: debtReliefPayments.lateFeeAmount,
-                        vehicleInsurance: debtReliefPayments.vehicleInsurance,
-                        lifeInsurance: debtReliefPayments.lifeInsurance,
-                        igvInsurance: debtReliefPayments.igvInsurance,
-                        preventionInsurance: debtReliefPayments.preventionInsurance,
+                        ...debtReliefPayments,
                         collectionLocationCode: payment.collectionLocationCode,
                         paymentType: payment.paymentType,
                         banckAccountCode: null,
