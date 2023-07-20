@@ -14,7 +14,7 @@ const debtReliefRepository = new DebtReliefRepositoryHTTP(debtReliedService);
 const debtReliefUsecase = new CreateDebtReliefUsecase(debtReliefRepository);
 const findDebtReliefUsecase = new FindDebtReliefUsecase(debtReliefRepository);
 const deleteDebtReliefUsecase = new DeleteDebtReliefUseCase(debtReliefRepository);
-const simulateDebtReliefUsecase = new SimulateDebtReliefUsecase(debtReliefRepository);
+const simulateDebtReliefUsecase = new SimulateDebtReliefUsecase();
 
 const debtController = new DebtReliefController(debtReliefUsecase, findDebtReliefUsecase, deleteDebtReliefUsecase, simulateDebtReliefUsecase);
 
