@@ -8,7 +8,7 @@ import { CreditService } from "../services/credit.service";
 import axios from 'axios';
 import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
 
-export class DebtReliefRepositoryHTTP implements DebtReliefRepository {
+export class DebtReliefAdapter implements DebtReliefRepository {
    lb4Host: string;
    paymentService: PaymentService;
    creditService: CreditService;

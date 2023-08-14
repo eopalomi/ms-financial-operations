@@ -20,4 +20,4 @@ export class DebtReliefService {
         const schedule = this.paymentScheduleService.findPaymentSchedule(creditCode)
         return schedule;
     }
-}
+};

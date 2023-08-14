@@ -1,13 +1,12 @@
 import { Request, Response } from "express";
-import { CreateDebtReliefUsecase } from "../../application/create-debt-relief.use-case";
+import { CreateDebtReliefUsecase } from "../../application/debt-relief/create-debt-relief.use-case";
 import { DebtRelief } from "../../domain/model/debt-relief.model";
-import { FindDebtReliefUsecase } from "../../application/find-debt-relief.use-case";
-import { DeleteDebtReliefUseCase } from "../../application/delete-debt-relief.use-case";
+import { FindDebtReliefUsecase } from "../../application/debt-relief/find-debt-relief.use-case";
+import { DeleteDebtReliefUseCase } from "../../application/debt-relief/delete-debt-relief.use-case";
 import { CreateDebtReliefDTO } from "../DTO/create-debt-relief-params.dto";
 import { ValidationError, validate } from "class-validator";
 import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
-import { map } from "lodash";
-import { SimulateDebtReliefUsecase } from "../../application/simulate-debt-relief.use-case";
+import { SimulateDebtReliefUsecase } from "../../application/debt-relief/simulate-debt-relief.use-case";
 import { SimulateDebtReliefParamsDTO } from "../DTO/simulate-debt-relief-params.dto";
 
 export class DebtReliefController {

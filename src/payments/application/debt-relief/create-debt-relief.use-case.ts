@@ -1,7 +1,7 @@
-import { DebtRelief } from '../domain/model/debt-relief.model';
-import { DebtReliefRepository } from '../domain/repositories/debt-relief.repository';
-import { debtReliefException } from '../shared/exceptions/debt-relief.exceptions';
-import { DebtReliefService } from './services/debt-relief.service';
+import { DebtRelief } from '../../domain/model/debt-relief.model';
+import { DebtReliefRepository } from '../../domain/repositories/debt-relief.repository';
+import { debtReliefException } from '../../shared/exceptions/debt-relief.exceptions';
+import { DebtReliefService } from '../services/debt-relief.service';
 
 export class CreateDebtReliefUsecase {
   debtReliefService: DebtReliefService;

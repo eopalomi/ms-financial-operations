@@ -1,6 +1,6 @@
-import { DebtRelief } from "../domain/model/debt-relief.model";
-import { SimulateDebtReliefParamsDTO } from "../infrastructure/DTO/simulate-debt-relief-params.dto";
-import { DebtReliefService } from './services/debt-relief.service';
+import { DebtRelief } from "../../domain/model/debt-relief.model";
+import { SimulateDebtReliefParamsDTO } from "../../infrastructure/DTO/simulate-debt-relief-params.dto";
+import { DebtReliefService } from '.././services/debt-relief.service';
 
 export class SimulateDebtReliefUsecase {
     debtReliefService: DebtReliefService;
