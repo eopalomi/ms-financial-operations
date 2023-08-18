@@ -67,7 +67,7 @@ export abstract class Payments {
     }
 
     validate() {
-        const regexValHour = /^(0?[1-9]|1[0-2]):[0-5][0-9]:[0-5][0-9] (AM|PM)$/;
+        const regexValHour = /^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] (AM|PM)$/;
         const regexValDate = /^\d{4}-\d{2}-\d{2}$/;
 
         if (!regexValHour.test(this.paymentHour)) {
