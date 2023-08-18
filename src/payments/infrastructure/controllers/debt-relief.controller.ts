@@ -78,21 +78,24 @@ export class DebtReliefController {
     deleteDebtRelief = async (req: Request, res: Response) => {
         const { creditCode } = req.params;
         const { id_pagcre } = req.query;
+        const { idPayment } = req.body
 
         try {
             if (!creditCode) {
                 throw new debtReliefException('creditCodeEmpty', 'Credit code is empty');
             };
 
-            if (!id_pagcre) {
+            if (!idPayment) {
                 throw new debtReliefException('idPaymentIsEmpty', 'payment id is empty');
             };
 
-            await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
+            // await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
+            await this.deleteDebtReliefUseCase.execute(creditCode, +idPayment)
 
             return this.sendResponse(res, 200, {
                 code: '00',
-                message: 'Debt relief was successfully deleted'
+                message: 'Debt relief was successfully deleted',
+                response: req.body
             });
         } catch (error) {
             this.handleErrors(error as Error);
