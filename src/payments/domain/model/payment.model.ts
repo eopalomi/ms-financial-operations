@@ -67,7 +67,7 @@ export abstract class Payments {
     }
 
     validate() {
-        const regexValHour = /^([01]\d|2[0-3]):([0-5]\d)$/;
+        const regexValHour = /^(0?[1-9]|1[0-2]):[0-5][0-9]:[0-5][0-9] (AM|PM)$/;
         const regexValDate = /^\d{4}-\d{2}-\d{2}$/;
 
         if (!regexValHour.test(this.paymentHour)) {
@@ -75,7 +75,7 @@ export abstract class Payments {
         }
 
         if (!regexValDate.test(this.paymentDate)) {
-            throw new debtReliefException('invalidFormatPaymentDate', 'Invalid format payment date');
+            throw new debtReliefException('invalidFormatPaymentDate', 'Invalid format payment date: ' + this.paymentDate);
         }
 
         if (!regexValDate.test(this.paymentValueDate)) {
