@@ -90,7 +90,7 @@ export class DebtReliefController {
 
             await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
 
-            return this.sendResponse(res, 204, {
+            return this.sendResponse(res, 200, {
                 code: '00',
                 message: 'Debt relief was successfully deleted'
             });
