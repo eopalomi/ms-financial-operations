@@ -1,4 +1,5 @@
-import { creditPaymentInterfaceDTO } from "../DTO/pag_cuo.dto";
+import { CancelledPaymentDTO } from "../DTO/cancelled-payment.dto";
+import { creditPaymentDTO } from "../DTO/pag_cuo.dto";
 import axios from 'axios';
 
 export class PaymentService {
@@ -17,6 +18,24 @@ export class PaymentService {
         const {data: payment } = await axios.get(`${this.lb4Host}/payment-process`);
 
         return payment.id_pagcre;
+    }
+
+    public getCanceledPaymentNextId = async (isOwnCredit: boolean): Promise<number> => {
+        const path = isOwnCredit ? 'own-payment-canceled' : 'transferred-payment-canceled';
+        
+        const filters = {
+            limit: 1,
+            order: "codigo desc",
+            fields: {
+              codigo: true
+            }
+        };
+
+        const encodedPath = encodeURIComponent(JSON.stringify(filters));
+
+        const {data: [nextID] } = await axios.get(`${this.lb4Host}/${path}?filter=${encodedPath}`);
+
+        return +nextID.codigo + 1;
     }
 
     public toPayment = (paymentData: {
@@ -69,12 +88,12 @@ export class PaymentService {
         pag_seg_prev: number
         cod_ds: number | null,
         usu_aut_con: string | null
-     }): creditPaymentInterfaceDTO  => {
-        const creditPayment: creditPaymentInterfaceDTO = {
+     }): creditPaymentDTO  => {
+        const creditPayment: creditPaymentDTO = {
             cod_cre: paymentData.cod_cre,
             num_cuo: paymentData.num_cuo,
             lug_rec: paymentData.lug_rec,
-            num_ric: String(paymentData.num_ric),
+            num_ric: +paymentData.num_ric,
             cod_int: String(paymentData.cod_int),
             fec_pag: String(paymentData.fec_pag),
             hor_pag: String(paymentData.hor_pag),
@@ -157,4 +176,186 @@ export class PaymentService {
     
         return creditPayment;
     };
-}
+
+    public toCancelledPayment = (paymentData: {
+        codigo: number,
+        cod_per_anu: string,
+        fec_anu: string,
+        ip_anu: string,
+        cod_cre: string,
+        num_cuo: number,
+        lug_rec: string,
+        num_ric: number,
+        cod_int: string,
+        fec_pag: string,
+        hor_pag: string,
+        fec_doc: string,
+        pago: number,
+        pag_cap: number,
+        pag_int: number,
+        pag_seg: number,
+        pag_seg_desgra: number,
+        pag_mor: number,
+        pag_mor_mor: number,
+        pag_mor_com: number,
+        pag_itf: number,
+        pag_igv: number,
+        dia_int: number,
+        dia_mor: number,
+        cod_ubi: string,
+        tip_ope: string,
+        ult_pag: string | null,
+        cod_oei: string,
+        enc_cap: number,
+        enc_int: number,
+        enc_mor: number,
+        enc_mor_mor: number,
+        enc_mor_com: number,
+        enc_seg: number,
+        enc_seg_desgra: number,
+        cal_cap: number,
+        cal_int: number,
+        cal_rea: number,
+        cal_mor: number,
+        cal_imo: number,
+        cal_gas: number,
+        cap_por: number,
+        int_por: number,
+        cap_ven: number,
+        int_ven: number,
+        hor_rec: string | null,
+        vou_eess: string | null,
+        bru_eess: number | null,
+        itf_ent: number | null,
+        itf_sal: number | null,
+        rec_net: number | null,
+        com_cof: number | null,
+        net_tot: number | null,
+        cod_eess: string | null,
+        nom_eess: string | null,
+        swt_tip_pag: string,
+        fec_reg: string,
+        hor_reg: string,
+        usu_reg: string,
+        fec_reg_pag: string,
+        fec_pag_rea: string,
+        tip_pagcuo: string | null,
+        swt_ser: string,
+        can_ant: string | null,
+        swt_can: string  | null,
+        emp_tra: string,
+        emp_ven: string,
+        fue_fin_pag: string,
+        mod_rea_pag: string,
+        tip_amo_rop: string,
+        fec_ven_pag: string,
+        swt_mig_pag_ven: string,
+        dia_int_ec: number,
+        tip_cam: number,
+        mor_enc: number,
+        cue_ban: string  | null,
+        ori_tip_cam: string,
+        swt_pag_ban: string  | null,
+        num_vou_ban: string  | null,
+        id_pagcre: number,
+        co_dispag: number,
+        fe_propre: string,
+        pag_bol_int: number,
+        pag_seg_prev: number,
+        cod_ds: number | null,
+        usu_aut_con: string | null
+    }
+    ): CancelledPaymentDTO => {
+        const cancelledPaymentDTO: CancelledPaymentDTO = {
+                codigo: +paymentData.codigo,
+                cod_per_anu: paymentData.cod_per_anu,
+                fec_anu: paymentData.fec_anu,
+                ip_anu: paymentData.ip_anu,
+                cod_cre: paymentData.cod_cre,
+                num_cuo: paymentData.num_cuo,
+                lug_rec: paymentData.lug_rec,
+                num_ric: paymentData.num_ric,
+                cod_int: paymentData.cod_int,
+                fec_pag: paymentData.fec_pag,
+                hor_pag: paymentData.hor_pag,
+                fec_doc: paymentData.fec_doc,
+                pago: +paymentData.pago,
+                pag_cap: +paymentData.pag_cap,
+                pag_int: +paymentData.pag_int,
+                pag_seg: +paymentData.pag_seg,
+                pag_seg_desgra: +paymentData.pag_seg_desgra,
+                pag_mor: +paymentData.pag_mor,
+                pag_mor_mor: +paymentData.pag_mor_mor ?? 0.00,
+                pag_mor_com: +paymentData.pag_mor_com ?? 0.00,
+                pag_itf: +paymentData.pag_itf,
+                pag_igv: +paymentData.pag_igv,
+                dia_int: +paymentData.dia_int,
+                dia_mor: +paymentData.dia_mor,
+                cod_ubi: paymentData.cod_ubi,
+                tip_ope: paymentData.tip_ope,
+                ult_pag: paymentData.ult_pag,
+                cod_oei: paymentData.cod_oei,
+                enc_cap: +paymentData.enc_cap,
+                enc_int: +paymentData.enc_int,
+                enc_mor: +paymentData.enc_mor,
+                enc_mor_mor: +paymentData.enc_mor_mor,
+                enc_mor_com: +paymentData.enc_mor_com,
+                enc_seg: +paymentData.enc_seg,
+                enc_seg_desgra: +paymentData.enc_seg_desgra,
+                cal_cap: +paymentData.cal_cap,
+                cal_int: +paymentData.cal_int,
+                cal_rea: +paymentData.cal_rea,
+                cal_mor: +paymentData.cal_mor,
+                cal_imo: +paymentData.cal_imo,
+                cal_gas: +paymentData.cal_gas,
+                cap_por: +paymentData.cap_por,
+                int_por: +paymentData.int_por,
+                cap_ven: +paymentData.cap_ven,
+                int_ven: +paymentData.int_ven,
+                hor_rec: paymentData.hor_rec,
+                vou_eess: paymentData.vou_eess,
+                bru_eess: paymentData.bru_eess,
+                itf_ent: +(paymentData.itf_ent ?? 0.00),
+                itf_sal: +(paymentData.itf_sal ?? 0.00),
+                rec_net: +(paymentData.rec_net ?? 0.00),
+                com_cof: +(paymentData.com_cof ?? 0.00),
+                net_tot: +(paymentData.net_tot ?? 0.00),
+                cod_eess: paymentData.cod_eess,
+                nom_eess: paymentData.nom_eess,
+                swt_tip_pag: paymentData.swt_tip_pag,
+                fec_reg: paymentData.fec_reg,
+                hor_reg: paymentData.hor_reg,
+                usu_reg: paymentData.usu_reg,
+                fec_reg_pag: paymentData.fec_reg_pag,
+                fec_pag_rea: paymentData.fec_pag_rea,
+                tip_pagcuo: paymentData.tip_pagcuo,
+                swt_ser: paymentData.swt_ser,
+                can_ant: paymentData.can_ant,
+                swt_can: paymentData.swt_can,
+                emp_tra: paymentData.emp_tra,
+                emp_ven: paymentData.emp_ven,
+                fue_fin_pag: paymentData.fue_fin_pag,
+                mod_rea_pag: paymentData.mod_rea_pag,
+                tip_amo_rop: paymentData.tip_amo_rop,
+                fec_ven_pag: paymentData.fec_ven_pag,
+                swt_mig_pag_ven: paymentData.swt_mig_pag_ven,
+                dia_int_ec: +paymentData.dia_int_ec,
+                tip_cam: +paymentData.tip_cam ?? 1.00,
+                mor_enc: +paymentData.mor_enc ?? 0.00,
+                cue_ban: paymentData.cue_ban,
+                ori_tip_cam: paymentData.ori_tip_cam,
+                swt_pag_ban: paymentData.swt_pag_ban,
+                num_vou_ban: paymentData.num_vou_ban,
+                id_pagcre: +paymentData.id_pagcre,
+                co_dispag: +paymentData.co_dispag,
+                fe_propre: paymentData.fe_propre,
+                pag_bol_int: +paymentData.pag_bol_int,
+                pag_seg_prev: +paymentData.pag_seg_prev ?? 0.00,
+                cod_ds: +(paymentData.cod_ds ?? 0),
+                usu_aut_con: paymentData.usu_aut_con,
+        }
+
+        return cancelledPaymentDTO;
+    };
+
+};

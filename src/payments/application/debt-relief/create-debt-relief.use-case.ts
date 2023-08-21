@@ -1,17 +1,13 @@
 import { DebtRelief } from '../../domain/model/debt-relief.model';
 import { DebtReliefRepository } from '../../domain/repositories/debt-relief.repository';
 import { debtReliefException } from '../../shared/exceptions/debt-relief.exceptions';
-import { DebtReliefService } from '../services/debt-relief.service';
 
 export class CreateDebtReliefUsecase {
-  debtReliefService: DebtReliefService;
-
-  constructor(private debtWaiverRepository: DebtReliefRepository) {
-    this.debtReliefService = new DebtReliefService()
-  }
+  constructor(private debtReliefRepository: DebtReliefRepository) {}
 
   execute = async (debtRelief: DebtRelief): Promise<void> => {
-    const amounts = await this.debtReliefService.installmentAmounts(debtRelief.creditCode, debtRelief.numberPayment)
+    const schedule = await this.debtReliefRepository.findPaymentSchedule(debtRelief.creditCode);
+    const amounts = schedule.installments.find((installment)=> installment.numberPayment ===  debtRelief.numberPayment);
 
     if (!amounts) {
       throw new Error("installment number not found");
@@ -29,7 +25,7 @@ export class CreateDebtReliefUsecase {
       throw new debtReliefException('amountGreaterBalance', 'amount is greater than installment balance');
     }
 
-    await this.debtWaiverRepository.save(debtRelief);
+    await this.debtReliefRepository.save(debtRelief);
   };
 
 }

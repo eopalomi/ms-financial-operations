@@ -1,23 +1,20 @@
 import { DebtRelief } from "../../domain/model/debt-relief.model";
+import { DebtReliefRepository } from "../../domain/repositories/debt-relief.repository";
 import { SimulateDebtReliefParamsDTO } from "../../infrastructure/DTO/simulate-debt-relief-params.dto";
-import { DebtReliefService } from '.././services/debt-relief.service';
 
 export class SimulateDebtReliefUsecase {
-    debtReliefService: DebtReliefService;
 
-    constructor() {
-        this.debtReliefService = new DebtReliefService();
-    }
+    constructor(private debtReliefRepository: DebtReliefRepository) {}
 
     execute = async (creditPayments: SimulateDebtReliefParamsDTO[]): Promise<DebtRelief[]> => {
         let payments: DebtRelief[] = []
 
         const paymentPromises = creditPayments.map(async (payment) => {
-            let paymentSchedule = await this.debtReliefService.paymentSchedule(payment.creditCode);
-
+            const paymentSchedule = await this.debtReliefRepository.findPaymentSchedule(payment.creditCode);
+            
             if (!paymentSchedule) return;
 
-            paymentSchedule.paymentInstallment.reduce((amountBalance, installment) => {
+            paymentSchedule.installments.reduce((amountBalance, installment) => {
                 if (amountBalance > 0) {
                     let debtReliefPayments = {
                         principalAmount: 0.00,

@@ -1,8 +1,8 @@
-import { PaymentInstallment } from "./payment-installment.model";
+import { Installment } from "./payment-installment.model";
 
 export class PaymentShedule {
     public readonly creditCode: string;
-    public readonly paymentInstallment: PaymentInstallment[] = [];
+    public readonly installments: Installment[] = [];
 
     constructor(constructor: {
         creditCode: string
@@ -27,7 +27,7 @@ export class PaymentShedule {
         igvInsuranceBalance: number
         preventionInsuranceBalance: number
     }) {
-        const installmentNumber = new PaymentInstallment({
+        const installmentNumber = new Installment({
             numberPayment: data.numberPayment,
             paymentDate: data.paymentDate,
             principal: data.principal,
@@ -45,7 +45,7 @@ export class PaymentShedule {
             preventionInsuranceBalance: data.preventionInsuranceBalance
         });
 
-        this.paymentInstallment.push(installmentNumber)
+        this.installments.push(installmentNumber)
     }
 
 }

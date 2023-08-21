@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { PaymentShedule } from "../../domain/models/payment-schedule.model";
 import { PaymentScheduleRepository } from '../../domain/repositories/payment-schedule.repository';
 
-export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository {
+export class PaymentScheduleAdapter implements PaymentScheduleRepository {
 
     constructor() { }
 
@@ -17,10 +17,8 @@ export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository 
     async find(creditCode: string): Promise<any> {
         const objFilter =
         {
-            offset: 0,
             limit: 240,
-            skip: 0,
-            order: "",
+            order: "num_cuo",
             where: {
                 cod_cre: creditCode
             },
@@ -51,13 +49,13 @@ export class PaymentScheduleRepositoryHTTP implements PaymentScheduleRepository 
 
         const url = `${process.env.HOST_NAME_LB}:${process.env.PORT_LB}/${getHttpPath}?filter=${encodedPayload}`;
 
-        const { data: response } = await axios.get<any[]>(url);
+        const { data: schedule } = await axios.get<any[]>(url);
 
         let paymentShedule = new PaymentShedule({
-            creditCode: response[0]?.cod_cre
+            creditCode: schedule[0]?.cod_cre
         });
 
-        response.forEach((schedule) => {
+        schedule.forEach((schedule) => {
             if (parseInt(schedule.num_cuo) > 0) {
                 paymentShedule.addInstallmentNumber({
                     numberPayment: parseInt(schedule.num_cuo),

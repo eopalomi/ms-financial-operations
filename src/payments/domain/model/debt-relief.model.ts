@@ -1,7 +1,7 @@
 import { Payments } from "./payment.model";
 
 export class DebtRelief extends Payments {
-  public readonly authorizationPersonCode: string;
+  public readonly authorizationPersonCode: string | null;
   public readonly requestingPersonCode: string | null;
   public readonly idDocumentWF: number | null;
 
@@ -22,7 +22,7 @@ export class DebtRelief extends Payments {
     paymentDate: string,
     paymentHour: string,
     paymentValueDate: string,
-    authorizationPersonCode: string,
+    authorizationPersonCode: string | null,
     requestingPersonCode: string | null,
     registeringPersonCode: string,
     idDocumentWF: number | null,

@@ -8,16 +8,9 @@ import { ValidationError, validate } from "class-validator";
 import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
 import { SimulateDebtReliefUsecase } from "../../application/debt-relief/simulate-debt-relief.use-case";
 import { SimulateDebtReliefParamsDTO } from "../DTO/simulate-debt-relief-params.dto";
+import { DeleteDebtReliefDTO } from "../DTO/delete-debt-relief-params.dto";
 
 export class DebtReliefController {
-    private errorResponse = {
-        statusCode: 500,
-        response: {
-            code: '99',
-            message: 'Internal Server Error'
-        }
-    };
-
     constructor(
         private createDebtReliefUsecase: CreateDebtReliefUsecase,
         private findDebtReliefUsecase: FindDebtReliefUsecase,
@@ -27,8 +20,8 @@ export class DebtReliefController {
 
     createDebtRelief = async (req: Request, res: Response) => {
         try {
-            const body = req.body;
-            const createDebtReliefDTO: CreateDebtReliefDTO = Object.assign(new CreateDebtReliefDTO(), body);
+            const createDebtReliefDTO: CreateDebtReliefDTO = Object.assign(new CreateDebtReliefDTO(), req.body);
+
             const errors = await validate(createDebtReliefDTO);
 
             if (errors.length > 0) {
@@ -47,56 +40,56 @@ export class DebtReliefController {
                 code: '00',
                 message: 'Debt Relief created successfully',
                 data: debtReliefProps
-            });
+            }, null);
         } catch (error) {
-            this.handleErrors(error as Error);
-            return this.sendResponse(res, this.errorResponse.statusCode, this.errorResponse.response);
+            return this.sendResponse(res, null, null, error as Error);
         }
     };
 
     findDebtReliefs = async (req: Request, res: Response) => {
-        const { creditCode } = req.params;
-
-        if (!creditCode) {
-            throw new debtReliefException('creditCodeEmpty', 'Credit code is empty');
-        };
-
         try {
+            const { creditCode } = req.params;
+
+            if (!creditCode) {
+                throw new debtReliefException('creditCodeEmpty', 'Credit code is empty');
+            };
+
             const debtsRelief = await this.findDebtReliefUsecase.findAll(creditCode);
 
             return this.sendResponse(res, 200, {
                 code: '00',
                 message: 'Debt relief was successfully found',
                 data: debtsRelief
-            });
+            }, null);
         } catch (error) {
-            this.handleErrors(error as Error);
-            return this.sendResponse(res, this.errorResponse.statusCode, this.errorResponse.response);
+            return this.sendResponse(res, null, null, error as Error);
         }
     }
 
     deleteDebtRelief = async (req: Request, res: Response) => {
-        const { creditCode } = req.params;
-        const { id_pagcre } = req.query;
-
         try {
+            const { creditCode } = req.params;
+            
+            const deleteDebtReliefDTO: DeleteDebtReliefDTO = Object.assign(new DeleteDebtReliefDTO(), req.body);
+
+            const errors = await validate(deleteDebtReliefDTO);
+
+            if (errors.length > 0){
+                return res.status(400).json({ errors });
+            }
+
             if (!creditCode) {
                 throw new debtReliefException('creditCodeEmpty', 'Credit code is empty');
             };
 
-            if (!id_pagcre) {
-                throw new debtReliefException('idPaymentIsEmpty', 'payment id is empty');
-            };
-
-            await this.deleteDebtReliefUseCase.execute(creditCode, parseInt(id_pagcre as string))
+            await this.deleteDebtReliefUseCase.execute(creditCode, deleteDebtReliefDTO.idPayment, deleteDebtReliefDTO.personCode, deleteDebtReliefDTO.ip)
 
             return this.sendResponse(res, 204, {
                 code: '00',
                 message: 'Debt relief was successfully deleted'
-            });
+            }, null);
         } catch (error) {
-            this.handleErrors(error as Error);
-            return this.sendResponse(res, this.errorResponse.statusCode, this.errorResponse.response);
+            return this.sendResponse(res, null, null, error as Error);
         }
     }
 
@@ -121,28 +114,32 @@ export class DebtReliefController {
                 code: '00',
                 message: 'Debt Relief simulate successfully',
                 data: debtReliefs
-            });
+            }, null);
         } catch (error) {
-            this.handleErrors(error as Error);
-            return this.sendResponse(res, this.errorResponse.statusCode, this.errorResponse.response);
+            return this.sendResponse(res, null, null, error as Error);
         }
     };
 
-    private handleErrors(error: Error) {
-        if (error instanceof debtReliefException) {
-            this.errorResponse = {
-                statusCode: 400,
-                response: {
+    private sendResponse(res: Response, statusCode: number | null, responseData: any | null, error: Error | null) {
+        if (error) {
+            if (error instanceof debtReliefException) {
+                statusCode = 400;
+                responseData =  {
                     code: '01',
                     message: error.message
                 }
-            }
+            } else {
+                statusCode = 500;
+                responseData = {
+                    code: '99',
+                    message: 'Internal Server Error'
+                };
+            };
+
+            console.log(error)
+            console.trace(error)
         };
-
-        console.error(error);
-    }
-
-    private sendResponse(res: Response, statusCode: number, responseData: any) {
-        res.status(statusCode).json(responseData);
-    }
-}
+        
+        res.status(statusCode!).json(responseData);
+    };
+};

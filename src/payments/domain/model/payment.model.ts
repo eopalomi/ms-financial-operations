@@ -66,20 +66,24 @@ export abstract class Payments {
         this._idPayment = idPayment;
     }
 
+    get idPayment() {
+        return this._idPayment;
+    }
+
     validate() {
-        const regexValHour = /^([01]\d|2[0-3]):([0-5]\d)$/;
+        const regexValHour = /^(0[1-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] (AM|PM)$/;
         const regexValDate = /^\d{4}-\d{2}-\d{2}$/;
 
         if (!regexValHour.test(this.paymentHour)) {
-            throw new debtReliefException('invalidFormatPaymentHour', 'Invalid format payment Hour');
+            throw new debtReliefException('invalidFormatPaymentHour', 'Invalid format payment Hour: ' + this.paymentHour);
         }
 
         if (!regexValDate.test(this.paymentDate)) {
-            throw new debtReliefException('invalidFormatPaymentDate', 'Invalid format payment date');
+            throw new debtReliefException('invalidFormatPaymentDate', 'Invalid format payment date: ' + this.paymentDate);
         }
 
         if (!regexValDate.test(this.paymentValueDate)) {
-            throw new debtReliefException('invalidFormatPaymentValueDate', 'Invalid format payment value date');
+            throw new debtReliefException('invalidFormatPaymentValueDate', 'Invalid format payment value date: ' + this.paymentValueDate);
         }
     }
 

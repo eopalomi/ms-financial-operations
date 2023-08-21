@@ -1,8 +1,8 @@
-export interface creditPaymentInterfaceDTO {
+export interface creditPaymentDTO {
     cod_cre: string,
     num_cuo: number,
     lug_rec: string,
-    num_ric: string,
+    num_ric: number,
     cod_int: string,
     fec_pag: string,
     hor_pag: string,

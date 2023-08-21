@@ -1,4 +1,4 @@
-export class PaymentInstallment {
+export class Installment {
 
     public readonly numberPayment: number;
     public readonly paymentDate: string;

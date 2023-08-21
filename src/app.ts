@@ -13,6 +13,12 @@ app.use('/credit', paymentScheduleRoutes);
 
 const port = process.env.PORT || 1212;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
 });
+
+export default app;
+
+export const closeServer = () => {
+  server.close();
+}
