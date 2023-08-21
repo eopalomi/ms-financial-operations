@@ -40,7 +40,7 @@ export class DebtReliefAdapter implements DebtReliefRepository {
       
       const dateTime = {
          currentDate: () => formatedDate(new Date(), 'yyyy-mm-dd'),
-         currentHour: () => formatedDate(new Date(), 'hh:mm:ss_AP'),
+         currentHour: () => formatedDate(new Date(), 'hh:mm:ss AM|PM'),
          now: () => formatedDate(new Date(), 'YYYY-MM-DD_hhmmss'),
       };
       

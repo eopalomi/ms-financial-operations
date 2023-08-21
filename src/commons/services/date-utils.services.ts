@@ -1,9 +1,9 @@
-type DateFormats = 'yyyy-mm-dd' | 'YYYY-MM-DD_hhmmss' | 'hh:mm' | 'hh:mm:ss_AP';
+type DateFormats = 'yyyy-mm-dd' | 'YYYY-MM-DD_hhmmss' | 'hh:mm' | 'hh:mm:ss AM|PM';
 
-export const formatedDate = (date: Date, dateFormats: DateFormats): string  => {
+export const formatedDate = (date: Date, dateFormats: DateFormats): string => {
 
-    if(!dateFormats){
-        throw new Error("Function formatedDate requeri dateFormats arg");        
+    if (!dateFormats) {
+        throw new Error("Function formatedDate requeri dateFormats arg");
     };
 
     const year = date.getFullYear().toString();
@@ -13,7 +13,7 @@ export const formatedDate = (date: Date, dateFormats: DateFormats): string  => {
     const minuts = date.getMinutes().toString().padStart(2, '0');
     const seconds = date.getSeconds().toString().padStart(2, '0');
     const miliseconds = date.getMilliseconds().toString().padStart(3, '0');
-    
+
     let dateFormated: string | null = null;
 
     if (dateFormats === "YYYY-MM-DD_hhmmss") {
@@ -26,20 +26,6 @@ export const formatedDate = (date: Date, dateFormats: DateFormats): string  => {
 
     if (dateFormats === "hh:mm") {
         dateFormated = `${hour}:${minuts}`;
-    }
-
-    if (dateFormats === "hh:mm:ss_AP") {
-        let ampm: string = 'AM'
-        let hourFormat12: string;
-
-        if (+hour >= 12){
-            ampm = 'PM'
-            hourFormat12 = (+hour - 12).toString().padStart(2, '0');
-        } else {
-            hourFormat12 = hour;
-        }
-
-        dateFormated = `${hour}:${minuts}:${seconds} ${ampm}`;
     }
     
     return dateFormated ?? `${year}-${month}-${day}`;
