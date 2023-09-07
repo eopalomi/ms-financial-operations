@@ -58,7 +58,6 @@ export abstract class Payments {
         this.paymentValueDate = constructor.paymentValueDate;
         this.registeringPersonCode = constructor.registeringPersonCode;
         this._idPayment = constructor._idPayment;
-
         this.validate();
     }
 
