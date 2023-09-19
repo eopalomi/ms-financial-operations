@@ -69,23 +69,23 @@ export class DebtReliefController {
     deleteDebtRelief = async (req: Request, res: Response) => {
         try {
             const { creditCode } = req.params;
-            const { idPayment } = req.query;
-            
-            // const deleteDebtReliefDTO: DeleteDebtReliefDTO = Object.assign(new DeleteDebtReliefDTO(), req.body);
+            // const { idPayment } = req.query;
 
-            // const errors = await validate(deleteDebtReliefDTO);
+            const deleteDebtReliefDTO: DeleteDebtReliefDTO = Object.assign(new DeleteDebtReliefDTO(), req.body);
 
-            // if (errors.length > 0){
-            //     return res.status(400).json({ errors });
-            // }
+            const errors = await validate(deleteDebtReliefDTO);
+
+            if (errors.length > 0) {
+                return res.status(400).json({ errors });
+            }
 
             // if (!creditCode) {
-            if (!idPayment) {
+            if (!creditCode) {
                 throw new debtReliefException('creditCodeEmpty', 'Credit code is empty');
             };
 
-            // await this.deleteDebtReliefUseCase.execute(creditCode, deleteDebtReliefDTO.idPayment, deleteDebtReliefDTO.personCode, deleteDebtReliefDTO.ip)
-            await this.deleteDebtReliefUseCase.execute(creditCode, +idPayment, 'SS012', '0.0.0.0')
+            await this.deleteDebtReliefUseCase.execute(creditCode, deleteDebtReliefDTO.idPayment, deleteDebtReliefDTO.personCode, deleteDebtReliefDTO.ip)
+            // await this.deleteDebtReliefUseCase.execute(creditCode, +idPayment, 'SS012', '0.0.0.0')
 
             return this.sendResponse(res, 204, {
                 code: '00',
@@ -127,7 +127,7 @@ export class DebtReliefController {
         if (error) {
             if (error instanceof debtReliefException) {
                 statusCode = 400;
-                responseData =  {
+                responseData = {
                     code: '01',
                     message: error.message
                 }
@@ -142,7 +142,7 @@ export class DebtReliefController {
             console.log(error)
             console.trace(error)
         };
-        
+
         res.status(statusCode!).json(responseData);
     };
 };
