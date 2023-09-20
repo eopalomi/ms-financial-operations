@@ -1,3 +1,3 @@
-export interface PaymentRepository {
-    create(idPayment: number): void
+export type PaymentRepository = {
+   create(idPayment: number): void
 };

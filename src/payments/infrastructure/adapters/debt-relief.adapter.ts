@@ -1,12 +1,12 @@
-import { DebtReliefRepository, PaymentSchedule } from "../../domain/repositories/debt-relief.repository";
-import { DebtRelief } from "../../domain/model/debt-relief.model";
-import { creditPaymentDTO } from "../DTO/pag_cuo.dto";
-import { formatedDate } from "../../../commons/services/date-utils.services";
-import { PaymentService } from "../services/payment.service";
-import { CreditService } from "../services/credit.service";
+import { DebtReliefRepository, PaymentSchedule } from '../../domain/repositories/debt-relief.repository';
+import { DebtRelief } from '../../domain/model/debt-relief.model';
+import { CreditPaymentDTO } from '../DTO/pag_cuo.dto';
+import { formatedDate } from '../../../commons/services/date-utils.services';
+import { PaymentService } from '../services/payment.service';
+import { CreditService } from '../services/credit.service';
 import axios from 'axios';
-import { debtReliefException } from "../../shared/exceptions/debt-relief.exceptions";
-import { PaymentScheduleService } from "../../../paymentSchedule/application/service/payment-schedule.service";
+import { debtReliefException } from '../../shared/exceptions/debt-relief.exceptions';
+import { PaymentScheduleService } from '../../../payment-schedule/application/service/payment-schedule.service';
 
 export class DebtReliefAdapter implements DebtReliefRepository {
    private lb4Host: string;
@@ -20,7 +20,7 @@ export class DebtReliefAdapter implements DebtReliefRepository {
       this.creditService = new CreditService();
       this.paymentScheduleService = new PaymentScheduleService();
       
-   };
+   }
 
    save = async (debtRelief: DebtRelief): Promise<void> => {
       const schedule = await this.findPaymentSchedule(debtRelief.creditCode);
@@ -28,13 +28,13 @@ export class DebtReliefAdapter implements DebtReliefRepository {
 
       if (!dataPaymentNumber) {
          throw new debtReliefException('paymentNumberQuotaNotFound', 'payment number quota not found');
-      };
+      }
 
       const [creditInfo, idReceipt, idPayment] = await Promise.all([
          this.creditService.getCreditInformation(debtRelief.creditCode), 
          this.paymentService.getReceiptCode(),
          this.paymentService.getIdPayment()
-      ])
+      ]);
       
       debtRelief.idPayment = idPayment;
       
@@ -44,7 +44,7 @@ export class DebtReliefAdapter implements DebtReliefRepository {
          now: () => formatedDate(new Date(), 'YYYY-MM-DD_hhmmss'),
       };
       
-      const creditPayment: creditPaymentDTO = this.paymentService.toPayment({
+      const creditPayment: CreditPaymentDTO = this.paymentService.toPayment({
          cod_cre: debtRelief.creditCode,
          num_cuo: debtRelief.numberPayment,
          lug_rec: debtRelief.collectionLocationCode,
@@ -106,16 +106,16 @@ export class DebtReliefAdapter implements DebtReliefRepository {
          sal_igv: dataPaymentNumber.igvInsuranceBalance - debtRelief.igvInsurance,
          fec_can: dateTime.currentDate(),
          fec_can_cuo: dateTime.currentDate()
-      }
-      console.log("body: ", creditPayment);
+      };
+      
       try {
          await axios.post(`${this.lb4Host}/${creditInfo.paymentPath}`, creditPayment);
          await axios.patch(`${this.lb4Host}/${creditInfo.schedulesPath}/${debtRelief.creditCode}/${debtRelief.numberPayment}`, fieldsForUpdate);
-      } catch (error: any) {
-         console.error("Error details : ", error.response.data.error.details);
-         throw new Error(error)
+      } catch (error) {
+         //console.error("Error details : ", error.response.data.error.details);
+         throw new Error((error as Error).message);
       }
-   }
+   };
 
    delete = async (creditCode: string, idPayment: number, personCode: string, ip:string): Promise<void> => {
       try {
@@ -124,7 +124,7 @@ export class DebtReliefAdapter implements DebtReliefRepository {
          const encodedPath = encodeURIComponent(
             JSON.stringify({
                limit: 200,
-               order: "fec_reg_pag asc",
+               order: 'fec_reg_pag asc',
                where: {
                   cod_cre: creditCode,
                   id_pagcre: idPayment
@@ -132,7 +132,7 @@ export class DebtReliefAdapter implements DebtReliefRepository {
             })
          );
          
-         const { data: paymentsToCancel } = await axios.get<creditPaymentDTO[]>(
+         const { data: paymentsToCancel } = await axios.get<CreditPaymentDTO[]>(
             `${this.lb4Host}/${creditInfo.paymentPath}?filter=` + encodedPath
          );
          
@@ -147,11 +147,11 @@ export class DebtReliefAdapter implements DebtReliefRepository {
                ...payments 
             };
 
-            return axios.post<creditPaymentDTO[]>(
+            return axios.post<CreditPaymentDTO[]>(
                `${this.lb4Host}/${creditInfo.cancelPaymentPath}`, 
                this.paymentService.toCancelledPayment(canceledPayment)
-            )
-         })
+            );
+         });
 
          await Promise.all(paymentCanceledPromises);
 
@@ -160,15 +160,15 @@ export class DebtReliefAdapter implements DebtReliefRepository {
                id_pagcre: idPayment
             }
          });
-      } catch (error: any) {
-         console.error(error.response)
-         throw new Error('an error ocurred while delete the payment');
+      } catch (error) {
+         // console.error(error.response)
+         throw new Error((error as Error).message);
       }
-   }
+   };
 
    find = async (): Promise<DebtRelief> => {
-      throw new Error("Method not implemented.");
-   }
+      throw new Error('Method not implemented.');
+   };
 
    findAll = async (creditCode: string): Promise<DebtRelief[]> => {
       const creditInfoResponse = await this.creditService.getCreditInformation(creditCode);
@@ -176,17 +176,17 @@ export class DebtReliefAdapter implements DebtReliefRepository {
       const encodedPath = encodeURIComponent(
          JSON.stringify({
             limit: 500,
-            order: "fec_reg_pag desc",
+            order: 'fec_reg_pag desc',
             where: {
                cod_cre: creditCode,
-               lug_rec: "C5"
+               lug_rec: 'C5'
             }
          })
       );
 
-      const { data: payments } = await axios.get<creditPaymentDTO[]>(
+      const { data: payments } = await axios.get<CreditPaymentDTO[]>(
          `${this.lb4Host}/${creditInfoResponse.paymentPath}?filter=` + encodedPath
-      )
+      );
 
       const debtReliefs = payments.map(payment => {
          return new DebtRelief({
@@ -211,11 +211,11 @@ export class DebtReliefAdapter implements DebtReliefRepository {
             registeringPersonCode: payment.usu_reg,
             idDocumentWF: payment.cod_ds,
             idPayment: payment.id_pagcre,
-         })
-      })
+         });
+      });
 
       return debtReliefs;
-   }
+   };
 
    findPaymentSchedule = async (creditCode:string ): Promise<PaymentSchedule> => {
       const paymentSchedule = await this.paymentScheduleService.findPaymentSchedule(creditCode);

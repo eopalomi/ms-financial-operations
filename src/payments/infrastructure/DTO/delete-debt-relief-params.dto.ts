@@ -1,13 +1,12 @@
-import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 
 export class DeleteDebtReliefDTO {
-    @IsNumber()
-    idPayment!: number;
+   @IsNumber()
+      idPayment!: number;
 
-    @IsString()
-    personCode!: string;
+   @IsString()
+      personCode!: string;
 
-    @IsString()
-    ip!: string;
-
+   @IsString()
+      ip!: string;
 }

@@ -1,61 +1,61 @@
 import { IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateDebtReliefDTO {
-  @IsString()
-  creditCode!: string;
+   @IsString()
+      creditCode!: string;
 
-  @IsNumber()
-  amount!: number;
+   @IsNumber()
+      amount!: number;
 
-  @IsNumber()
-  numberPayment!: number;
+   @IsNumber()
+      numberPayment!: number;
 
-  @IsNumber()
-  principalAmount!: number;
+   @IsNumber()
+      principalAmount!: number;
 
-  @IsNumber()
-  interestAmount!: number;
+   @IsNumber()
+      interestAmount!: number;
 
-  @IsNumber()
-  lateFeeAmount!: number;
+   @IsNumber()
+      lateFeeAmount!: number;
 
-  @IsNumber()
-  vehicleInsurance!: number;
+   @IsNumber()
+      vehicleInsurance!: number;
 
-  @IsNumber()
-  lifeInsurance!: number;
+   @IsNumber()
+      lifeInsurance!: number;
 
-  @IsNumber()
-  igvInsurance!: number;
+   @IsNumber()
+      igvInsurance!: number;
 
-  @IsNumber()
-  preventionInsurance!: number;
+   @IsNumber()
+      preventionInsurance!: number;
 
-  @IsString()
-  collectionLocationCode!: string;
+   @IsString()
+      collectionLocationCode!: string;
 
-  @IsString()
-  @IsOptional()
-  paymentType!: string;
+   @IsString()
+   @IsOptional()
+      paymentType!: string;
 
-  @IsString()
-  paymentDate!: string;
+   @IsString()
+      paymentDate!: string;
 
-  @IsString()
-  paymentHour!: string;
+   @IsString()
+      paymentHour!: string;
 
-  @IsString()
-  paymentValueDate!: string;
+   @IsString()
+      paymentValueDate!: string;
 
-  @IsString()
-  authorizationPersonCode!: string;
+   @IsString()
+      authorizationPersonCode!: string;
 
-  @IsString()
-  requestingPersonCode!: string;
+   @IsString()
+      requestingPersonCode!: string;
 
-  @IsString()
-  registeringPersonCode!: string;
+   @IsString()
+      registeringPersonCode!: string;
 
-  @IsNumber()
-  idDocumentWF!: number;
+   @IsNumber()
+      idDocumentWF!: number;
 }

@@ -1,4 +1,4 @@
-import Express from 'express'
+import Express from 'express';
 import { DebtReliefController } from '../controllers/debt-relief.controller';
 import { DebtReliefAdapter } from '../adapters/debt-relief.adapter';
 import { CreateDebtReliefUsecase } from '../../application/debt-relief/create-debt-relief.use-case';

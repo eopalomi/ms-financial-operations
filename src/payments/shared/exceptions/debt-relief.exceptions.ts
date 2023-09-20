@@ -1,4 +1,4 @@
-type debtReliefErrorTypes =
+type DebtReliefErrorTypes =
     | 'default'
     | 'invalidFormatPaymentHour'
     | 'invalidFormatPaymentDate'
@@ -7,18 +7,19 @@ type debtReliefErrorTypes =
     | 'idPaymentIsEmpty'
     | 'paymentNumberQuotaNotFound'
     | 'invalidArrayBodyRequest'
+    | 'paymentInstallmentNumberNotFound'
     | 'amountGreaterBalance';
 
 const exceptionsFactory = () => {
-    return class customExceptionsFactory extends Error {
-        public readonly errorType: debtReliefErrorTypes;
+   return class CustomExceptionsFactory extends Error {
+      public readonly errorType: DebtReliefErrorTypes;
 
-        constructor(errorType: debtReliefErrorTypes, message: string) {
-            super(message);
+      constructor(errorType: DebtReliefErrorTypes, message: string) {
+         super(message);
 
-            this.errorType = errorType;
-        }
-    }
+         this.errorType = errorType;
+      }
+   };
 };
 
 export const debtReliefException = exceptionsFactory();

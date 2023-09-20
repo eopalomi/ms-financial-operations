@@ -1,37 +1,37 @@
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class SimulateDebtReliefParamsDTO {
-    @IsString()
-    creditCode!: string;
+   @IsString()
+      creditCode!: string;
 
-    @IsNumber()
-    amount!: number;
+   @IsNumber()
+      amount!: number;
 
-    @IsString()
-    collectionLocationCode!: string;
+   @IsString()
+      collectionLocationCode!: string;
 
-    @IsString()
-    @IsOptional()
-    paymentType!: string;
+   @IsString()
+   @IsOptional()
+      paymentType!: string;
 
-    @IsString()
-    paymentDate!: string;
+   @IsString()
+      paymentDate!: string;
 
-    @IsString()
-    paymentHour!: string;
+   @IsString()
+      paymentHour!: string;
 
-    @IsString()
-    paymentValueDate!: string;
+   @IsString()
+      paymentValueDate!: string;
 
-    @IsString()
-    authorizationPersonCode!: string;
+   @IsString()
+      authorizationPersonCode!: string;
 
-    @IsString()
-    requestingPersonCode!: string;
+   @IsString()
+      requestingPersonCode!: string;
 
-    @IsString()
-    registeringPersonCode!: string;
+   @IsString()
+      registeringPersonCode!: string;
 
-    @IsNumber()
-    idDocumentWF!: number;
+   @IsNumber()
+      idDocumentWF!: number;
 }

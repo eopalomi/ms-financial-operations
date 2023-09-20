@@ -12,10 +12,25 @@
         "plugin:@typescript-eslint/recommended"
     ],
     "rules": {
+        "no-console": 1,
         "@typescript-eslint/no-unused-vars": "error",
-        "@typescript-eslint/consistent-type-definitions": [
+        "@typescript-eslint/indent": ["error", 3],
+        "@typescript-eslint/semi": ["error", "always"],
+        "@typescript-eslint/quotes": ["error", "single"],
+        "@typescript-eslint/naming-convention": [
             "error",
-            "type"
+            {
+                "selector": "variable",
+                "format": ["camelCase"]
+            },
+            {
+                "selector": "typeLike",
+                "format": ["PascalCase"]
+            },
+            {
+                "selector": "method",
+                "format": ["camelCase"]
+            }
         ]
     },
     "env": {

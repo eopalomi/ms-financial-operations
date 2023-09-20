@@ -1,7 +1,7 @@
-import Express from 'express'
+import Express from 'express';
 import { PaymentScheduleAdapter } from '../adapters/payment-schedule.adapter';
-import { FindPaymentScheduleUsecase } from '../../../paymentSchedule/application/find-payment-schedule.use-case';
-import { PaymentScheduleController } from '../../../paymentSchedule/infrastructure/controllers/payment-schedule.controller';
+import { FindPaymentScheduleUsecase } from '../../../payment-schedule/application/find-payment-schedule.use-case';
+import { PaymentScheduleController }  from '../../../payment-schedule/infrastructure/controllers/payment-schedule.controller';
 
 const routes = Express.Router();
 
